@@ -1,0 +1,1 @@
+### Default attached scripts of the sinusbot which are ported to the script engine v2
