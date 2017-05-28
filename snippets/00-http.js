@@ -10,7 +10,7 @@ sinusbot.http({
         'Content-Type': 'application/json',
         'Content-Length': sendData.length
     }
-}, function(error, response) {
+}, function (error, response) {
     if (response.statusCode != 200) {
         engine.log(error);
         return;

@@ -8,7 +8,7 @@ registerPlugin({
         title: 'Comma-separated list of client-ids that the bot should follow',
         type: 'string'
     }]
-}, function(sinusbot, config) {
+}, function (sinusbot, config) {
 
     var engine = require('engine'),
         backend = require('backend'),
@@ -21,7 +21,7 @@ registerPlugin({
     }
 
     var uids = config.clientUids.split(',');
-    event.on('clientMove', function(ev) {
+    event.on('clientMove', function (ev) {
         if (uids.indexOf(ev.client.uniqueID()) >= 0 && ev.toChannel != null) {
             engine.log('Following ' + ev.client.name());
             backend.getBotClient().moveTo(ev.toChannel);

@@ -12,7 +12,7 @@ registerPlugin({
             'stop playback'
         ]
     }]
-}, function(sinusbot, config) {
+}, function (sinusbot, config) {
     var engine = require('engine'),
         backend = require('backend'),
         event = require('event'),
@@ -24,7 +24,7 @@ registerPlugin({
         LastTitle;
 
     audio.setMute(false);
-    event.on('clientMove', function(ev) {
+    event.on('clientMove', function (ev) {
         if (backend.getCurrentChannel().getClientCount() > 1 && isMuted) {
             isMuted = false;
             engine.log('Ending AloneMode...');

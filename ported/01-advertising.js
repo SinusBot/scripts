@@ -30,13 +30,13 @@ registerPlugin({
             'Server'
         ]
     }]
-}, function(sinusbot, config) {
+}, function (sinusbot, config) {
     var backend = require('backend');
-    var ads = (config && config.ads) ? config.ads.split('\n').map(function(e) {
+    var ads = (config && config.ads) ? config.ads.split('\n').map(function (e) {
         return e.trim().replace(/\r/g, '');
     }) : [];
     var ctr = -1;
-    setInterval(function() {
+    setInterval(function () {
         ctr++;
         if (ads.length == 0 || config.Interval < 5) return;
         var ad = ctr % ads.length;

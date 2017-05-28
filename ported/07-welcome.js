@@ -16,9 +16,9 @@ registerPlugin({
             'Poke'
         ]
     }]
-}, function(sinusbot, config) {
+}, function (sinusbot, config) {
     var event = require('event');
-    event.on('clientMove', function(ev) {
+    event.on('clientMove', function (ev) {
         var msg = config.message;
         msg = msg.replace(/%n/g, ev.client.name());
         if (ev.fromChannel == undefined) {

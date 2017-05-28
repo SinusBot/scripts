@@ -4,7 +4,7 @@ registerPlugin({
     description: 'Enter .bookmark to save the current position, enter .resume to seek to the bookmarked position.',
     author: 'Michael Friese <michael@sinusbot.com>',
     vars: []
-}, function(sinusbot, config) {
+}, function (sinusbot, config) {
 
     var store = require('store'),
         media = require('media'),
@@ -12,11 +12,11 @@ registerPlugin({
         audio = require('audio');
 
     var event = require('event');
-    event.on('chat', function(ev) {
+    event.on('chat', function (ev) {
         ev.client.chat('Hi, ' + ev.client.name() + ', you just wrote: ' + ev.text);
     });
 
-    event.on('chat', function(ev) {
+    event.on('chat', function (ev) {
         engine.log(ev.text);
         if (ev.text == '.bookmark') {
             engine.log("bookmark");
