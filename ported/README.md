@@ -1,1 +1,1 @@
-### Default attached scripts of the sinusbot which are ported to the script engine v2
+### Default attached scripts of the SinusBot which are ported to the script engine v2

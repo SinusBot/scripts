@@ -1,4 +1,4 @@
-### Scripts which help you to understand how sinusbot scripts works
+### Scripts which help you to understand how SinusBot scripts works
 
 |  Script |  What does it do? | More info |
 |---|---|---|
