@@ -2,7 +2,7 @@ registerPlugin({
     name: 'Advertising (Text)',
     version: '2.0',
     description: 'This script will announce one of the configured lines every x seconds.',
-    author: 'Michael Friese <michael@sinusbot.com>',
+    author: 'Michael Friese <michael@sinusbot.com> & maxibanki <max@schmitt.mx>',
     vars: [{
         name: 'ads',
         title: 'Ads (supports bbcode)',
