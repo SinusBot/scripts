@@ -2,7 +2,7 @@
 var engine = require('engine');
 
 // send request
-http({
+sinusbot.http({
     'method': 'GET',
     'url': 'http://example.com',
     'timeout': 6000,
