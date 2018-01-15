@@ -1,6 +1,6 @@
 registerPlugin({
     name: 'Example script',
-    version: '1.0',
+    version: '1.0.0',
     backends: ['ts3', 'discord'],
     description: 'This is a script description',
     author: 'name <email@example.com>',
