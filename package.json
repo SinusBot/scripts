@@ -1,0 +1,12 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "Example scripts based on the new scripting engine of the SinusBot.",
+  "main": "index.js",
+  "repository": "https://github.com/sinusbot/scripts",
+  "author": "SinusBot",
+  "license": "MIT",
+  "dependencies": {
+    "sinusbot-scripting-engine": "^1.0.0"
+  }
+}

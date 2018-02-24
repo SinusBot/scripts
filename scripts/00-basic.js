@@ -1,3 +1,4 @@
+// @ts-check
 registerPlugin({
     name: 'Example script',
     version: '1.0.0',
@@ -9,7 +10,7 @@ registerPlugin({
     // import modules
     var engine = require('engine');
     var event = require('event');
-
+    
     // listen for chat event
     event.on('chat', function (ev) {
         engine.log(ev.client.name() + ' wrote ' + ev.text);
