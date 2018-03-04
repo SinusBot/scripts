@@ -10,7 +10,7 @@ http({
     'url': 'http://example.com',
     'timeout': 6000,
     'maxSize': 1024 * 1024 * 5,
-    'data': sendData,
+    'body': sendData,
     'headers': {
         'Content-Type': 'application/json',
         'Content-Length': sendData.length
