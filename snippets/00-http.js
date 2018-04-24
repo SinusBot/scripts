@@ -5,7 +5,7 @@ var engine = require('engine');
 var sendData = JSON.stringify({ foo: 'bar' });
 
 // send request
-http({
+sinusbot.http({
     'method': 'POST',
     'url': 'http://example.com',
     'timeout': 6000,
