@@ -1,6 +1,6 @@
 registerPlugin({
     name: 'Bookmarks!',
-    version: '2.0',
+    version: '2.0.1',
     description: 'Enter .bookmark to save the current position, enter .resume to seek to the bookmarked position.',
     author: 'Michael Friese <michael@sinusbot.com> & maxibanki <max@schmitt.mx>',
     vars: []
@@ -12,9 +12,6 @@ registerPlugin({
         audio = require('audio');
 
     var event = require('event');
-    event.on('chat', function (ev) {
-        ev.client.chat('Hi, ' + ev.client.name() + ', you just wrote: ' + ev.text);
-    });
 
     event.on('chat', function (ev) {
         engine.log(ev.text);
