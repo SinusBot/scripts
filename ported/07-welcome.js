@@ -2,7 +2,7 @@ registerPlugin({
     name: 'Welcome!',
     version: '2.1',
     description: 'This plugin will let the bot greet everyone.',
-    author: 'Michael Friese <michael@sinusbot.com> & maxibanki <max@schmitt.mx>',
+    author: 'Michael Friese <michael@sinusbot.com> & mxschmitt <max@schmitt.mx>',
     vars: [{
         name: 'message',
         title: 'The message that should be displayed. (%n = nickname)',

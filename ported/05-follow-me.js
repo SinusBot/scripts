@@ -2,7 +2,7 @@ registerPlugin({
     name: 'Follow Me',
     version: '2.0',
     description: 'The bot will follow the movements of any of the clients given',
-    author: 'Michael Friese <michael@sinusbot.com> & maxibanki <max@schmitt.mx>',
+    author: 'Michael Friese <michael@sinusbot.com> & mxschmitt <max@schmitt.mx>',
     vars: [{
         name: 'clientUids',
         title: 'Comma-separated list of client-ids that the bot should follow',

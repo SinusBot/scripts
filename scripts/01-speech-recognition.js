@@ -3,7 +3,7 @@ registerPlugin({
     version: '1.1',
     backends: ["ts3"],
     description: 'This is a simple script that will write you Chuck Norris jokes when you say "joke"',
-    author: 'maxibanki <max@schmitt.mx> & irgendwer <Jonas@sandstorm-projects.de>',
+    author: 'mxschmitt <max@schmitt.mx> & irgendwer <Jonas@sandstorm-projects.de>',
     vars: [{
         name: 'msgtype',
         title: 'message type',
