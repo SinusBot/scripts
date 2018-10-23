@@ -1,13 +1,14 @@
 // import modules
 var engine = require('engine');
+var http = require('http');
 
 // define data that should be sent
 var sendData = JSON.stringify({ foo: 'bar' });
 
 // send request
-sinusbot.http({
+http.simpleRequest({
     'method': 'POST',
-    'url': 'http://example.com',
+    'url': 'https://example.com',
     'timeout': 6000,
     'maxSize': 1024 * 1024 * 5,
     'body': sendData,
@@ -16,24 +17,27 @@ sinusbot.http({
         'Content-Length': sendData.length
     }
 }, function (error, response) {
+    if (error) {
+        engine.log("Error: " + error);
+        return;
+    }
     
-    // check if request was successfull
     if (response.statusCode != 200) {
-        engine.log(error);
+        engine.log("HTTP Error: " + response.status);
         return;
     }
     
     // parse JSON response
     var res;
     try {
-        res = JSON.parse(response.data);
+        res = JSON.parse(response.data.toString());
     } catch (err) {
         engine.log(err.message);
     }
     
     // check if parsing was successfull
     if (res === undefined) {
-        engine.log("Error in JSON!");
+        engine.log("Invalid JSON.");
         return;
     }
     
