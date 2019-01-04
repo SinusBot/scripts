@@ -6,14 +6,14 @@ registerPlugin({
     description: 'This is a script description',
     author: 'name <email@example.com>',
     vars: []
-}, function (sinusbot, config) {
+}, (sinusbot, config) => {
     // import modules
-    var engine = require('engine');
-    var event = require('event');
+    const engine = require('engine');
+    const event = require('event');
     
     // listen for chat event
-    event.on('chat', function (ev) {
-        engine.log(ev.client.name() + ' wrote ' + ev.text);
-        ev.client.chat('Hi ' + ev.client.name() + ', you just wrote: ' + ev.text);
+    event.on('chat', ({client, text}) => {
+        engine.log(`${client.name()} wrote ${text}`);
+        client.chat(`Hi ${client.name()}, you just wrote: ${text}`);
     });
 });
