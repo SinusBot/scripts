@@ -11,7 +11,7 @@ registerPlugin({
   const BACKEND = "ts3"
   const IS_RUNNING = true
 
-  var tests = []
+  const tests = [];
 
   const engine = require("engine")
   const backend = require("backend")
@@ -23,13 +23,13 @@ registerPlugin({
   const event = require("event")
 
   function finalize() {
-    var [totalSuccess, totalFailed] = tests.reduce((acc, curr) => [acc[0] + curr.getStatus()[0], acc[1] + curr.getStatus()[1]], [0, 0])
+    const [totalSuccess, totalFailed] = tests.reduce((acc, curr) => [acc[0] + curr.getStatus()[0], acc[1] + curr.getStatus()[1]], [0, 0]);
     engine.log(`${totalSuccess}/${totalSuccess+totalFailed} tests passing`)
     if (totalFailed > 0) engine.log(`${totalFailed} Tests failed`)
   }
 
-  function describe() {
-    var test = new Test(...arguments)
+  function describe(...args) {
+    const test = new Test(...args);
     tests.push(test)
     return test
   }
@@ -385,11 +385,11 @@ registerPlugin({
           'method': 'GET',
           'url': 'https://postman-echo.com/status/200',
           'timeout': 10 * 1000,
-      }, (error, response) => {
+      }, (error, {statusCode, data}) => {
         //TODO: do this properly (dunno how to handle async stuff in this case :/)
         assert.equals(error, null)
-        assert.equals(response.statusCode, 200)
-        assert.equals(response.data.toString(), '{"status":200}')
+        assert.equals(statusCode, 200)
+        assert.equals(data.toString(), '{"status":200}')
       })
     })
 
