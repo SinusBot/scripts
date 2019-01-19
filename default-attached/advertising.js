@@ -30,23 +30,24 @@ registerPlugin({
             'Server'
         ]
     }]
-}, function (sinusbot, config) {
-    var backend = require('backend');
-    var ads = (config && config.ads) ? config.ads.split('\n').map(function (e) {
-        return e.trim().replace(/\r/g, '');
-    }) : [];
-    var ctr = -1;
-    setInterval(function () {
-        ctr++;
-        if (ads.length == 0 || config.Interval < 5) return;
-        var ad = ctr % ads.length;
+}, (_, config) => {
+    const backend = require('backend')
+    const helpers = require('helpers')
+
+    const ads = (config && config.ads) ? config.ads.split('\n').map(e => e.trim().replace(/\r/g, '')) : []
+    let ctr = -1
+
+    setInterval(() => {
+        ctr++
+        if (ads.length == 0 || config.Interval < 5) return
+        let ad = ctr % ads.length
         if (config.order == 1 && ads.length > 1) {
-            ad = sinusbot.getRand(ads.length - 1);
+            ad = helpers.getRandom(ads.length - 1)
         }
         if (config.type == 0) {
-            backend.getCurrentChannel().chat(ads[ad]);
+            backend.getCurrentChannel().chat(ads[ad])
         } else {
-            backend.chat(ads[ad]);
+            backend.chat(ads[ad])
         }
-    }, config.interval * 1000);
-});
+    }, config.interval * 1000)
+})

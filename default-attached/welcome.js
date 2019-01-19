@@ -16,18 +16,18 @@ registerPlugin({
             'Poke'
         ]
     }]
-}, function (sinusbot, config) {
-    var event = require('event');
-    event.on('clientMove', function (ev) {
-        var msg = config.message;
-        msg = msg.replace(/%n/g, ev.client.name());
-        if (ev.fromChannel == undefined) {
-            if (config.type == 0) {
-                ev.client.chat(msg);
+}, (_, { message, type }) => {
+    const event = require('event')
+
+    event.on('clientMove', ({ client, fromChannel }) => {
+        let msg = message
+        msg = msg.replace(/%n/g, client.name())
+        if (!fromChannel) {
+            if (type == 0) {
+                client.chat(msg)
             } else {
-                ev.client.poke(msg);
+                client.poke(msg)
             }
-            return;
         }
-    });
-});
+    })
+})

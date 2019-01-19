@@ -4,36 +4,50 @@ registerPlugin({
     description: 'Enter .bookmark to save the current position, enter .resume to seek to the bookmarked position.',
     author: 'Michael Friese <michael@sinusbot.com> & mxschmitt <max@schmitt.mx>',
     vars: []
-}, function (sinusbot, config) {
+}, () => {
+    const store = require('store')
+    const media = require('media')
+    const audio = require('audio')
+    const event = require('event')
 
-    var store = require('store'),
-        media = require('media'),
-        backend = require('backend'),
-        audio = require('audio');
+    const event = require("event")
 
-    var event = require('event');
+    event.on("load", () => {
+        //try to load the library
+        const Command = require("command")
+        //check if the library has been loaded successfully
+        if (!Command) throw new Error("Command.js library not found! Please download Command.js and enable it to be able use this script!")
 
-    event.on('chat', function (ev) {
-        engine.log(ev.text);
-        if (ev.text == '.bookmark') {
-            engine.log("bookmark");
-            var track = media.getCurrentTrack();
-            if (!track) return;
-            var pos = audio.getTrackPosition();
-            store.set(track.ID(), pos);
-            backend.getCurrentChannel().chat('Position saved for track ' + track.uuid + ' at ' + pos + 'ms.');
-        }
-        if (ev.text == '.resume') {
-            engine.log("resume");
-            var track = media.getCurrentTrack();
-            if (!track) return;
-            var pos = store.get(track.ID());
-            if (!pos) {
-                backend.getCurrentChannel().chat('No position found, sorry.');
-                return;
-            }
-            audio.seek(pos);
-            backend.getCurrentChannel().chat('Resumed at ' + pos + 'ms.');
-        }
-    });
-});
+        Command.createCommand("bookmark")
+            .help("saves the current position")
+            .manual("saves the current position")
+            .manual("can be resumed by the 'resume' command. (Seeks to the bookmarked position of the track)")
+            .exec((client, args, reply) => {
+                const track = media.getCurrentTrack()
+                if (!track) {
+                    return
+                }
+                const pos = audio.getTrackPosition()
+                store.set(track.ID(), pos)
+                reply(`Position saved for track ${track.uuid} at ${pos}ms.`)
+            })
+
+        Command.createCommand("resume")
+            .help("resumes to the bookmarked position")
+            .manual("resumes to the bookmarked position")
+            .manual("by using the 'seek' command, it can be saved")
+            .exec((client, args, reply) => {
+                const track = media.getCurrentTrack()
+                if (!track) {
+                    return
+                }
+                const pos = store.get(track.ID())
+                if (!pos) {
+                    reply('No position found, sorry.')
+                    return
+                }
+                audio.seek(pos)
+                reply(`Resumed at ${pos}ms.`)
+            })
+    })
+})

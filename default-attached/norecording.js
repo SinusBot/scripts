@@ -8,11 +8,12 @@ registerPlugin({
         title: 'The optional kick message.',
         type: 'string'
     }]
-}, function (sinusbot, config) {
-    var engine = require('engine');
-    var event = require('event'),
-        kickMessage = config.kickMessage ? config.kickMessage : 'No recording on our server!';
-    event.on('clientRecord', function (ev) {
+}, (_, config) => {
+    const event = require('event')
+    
+    const kickMessage = config.kickMessage || 'No recording on our server!'
+
+    event.on('clientRecord', ev => {
         ev.kickFromServer(kickMessage)
-    });
-});
+    })
+})

@@ -12,42 +12,45 @@ registerPlugin({
             'stop playback'
         ]
     }]
-}, function (sinusbot, config) {
-    var engine = require('engine'),
-        backend = require('backend'),
-        event = require('event'),
-        audio = require('audio'),
-        media = require('media');
+}, (_, { mode }) => {
+    const engine = require('engine')
+    const backend = require('backend')
+    const event = require('event')
+    const audio = require('audio')
+    const media = require('media')
 
-    var isMuted = false,
-        LastPosition = 0,
-        LastTitle;
+    let isMuted = false
+    let lastPosition = 0
+    let lastTitle
 
-    audio.setMute(false);
-    event.on('clientMove', function (ev) {
-        if (backend.getCurrentChannel().getClientCount() > 1 && isMuted) {
-            isMuted = false;
-            engine.log('Ending AloneMode...');
-            if (config.mode == 0) {
-                audio.setMute(false);
+    audio.setMute(false)
+
+    event.on('clientMove', () => {
+        let currentChannelClientCount = backend.getCurrentChannel().getClientCount()
+        if (currentChannelClientCount > 1 && isMuted) {
+            isMuted = false
+            engine.log('Ending AloneMode...')
+            if (mode == 0) {
+                audio.setMute(false)
             } else {
-                LastTitle.play();
-                audio.seek(LastPosition);
-                engine.log('Seeking to ' + LastPosition);
+                lastTitle.play()
+                audio.seek(lastPosition)
+                engine.log(`Seeking to ${lastPosition}`)
+
             }
-            return;
+            return
         }
-        if (backend.getCurrentChannel().getClientCount() <= 1 && audio.isPlaying()) {
-            isMuted = true;
-            engine.log('Starting AloneMode...');
-            if (config.mode == 0) {
-                audio.setMute(true);
+        if (currentChannelClientCount <= 1 && audio.isPlaying()) {
+            isMuted = true
+            engine.log('Starting AloneMode...')
+            if (mode == 0) {
+                audio.setMute(true)
             } else {
-                LastPosition = getPos();
-                engine.log('Pos is ' + LastPosition);
-                LastTitle = media.getCurrentTrack();
-                media.stop();
+                lastPosition = getPos()
+                engine.log(`Pos is ${lastPosition}`)
+                lastTitle = media.getCurrentTrack()
+                media.stop()
             }
         }
-    });
-});
+    })
+})

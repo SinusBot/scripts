@@ -8,26 +8,22 @@ registerPlugin({
         title: 'Comma-separated list of client-ids that the bot should follow',
         type: 'string'
     }]
-}, function (sinusbot, config) {
+}, (_, { clientUids }) => {
+    const engine = require('engine')
+    const backend = require('backend')
+    const event = require('event')
 
-    var engine = require('engine'),
-        backend = require('backend'),
-        event = require('event');
-
-
-    if (!config.clientUids) {
-        engine.log('Invalid clientUids');
-        return;
+    if (!clientUids) {
+        engine.log('Invalid clientUids')
+        return
     }
-
-    var uids = config.clientUids.split(',');
-    event.on('clientMove', function (ev) {
-        if (uids.indexOf(ev.client.uniqueID()) >= 0 && ev.toChannel != null) {
-            engine.log('Following ' + ev.client.name());
-            backend.getBotClient().moveTo(ev.toChannel);
-            return;
+    const uids = clientUids.split(',')
+    event.on('clientMove', ({ client, toChannel }) => {
+        if (uids.includes(client.uniqueID()) && toChannel) {
+            engine.log(`Following ${client.name()}`)
+            backend.getBotClient().moveTo(toChannel)
         }
-    });
+    })
 
-    engine.log('Follow Me initialized...');
-});
+    engine.log('Follow Me initialized...')
+})
