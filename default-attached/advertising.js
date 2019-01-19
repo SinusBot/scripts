@@ -46,7 +46,7 @@ registerPlugin({
         engine.log("The intervall is too small, use > 3 not to be banned from the server")
         return
     }
-
+    
     setInterval(() => {
         let adIdx = counter % ads.length
         // prevent overflow of the counter
@@ -56,7 +56,7 @@ registerPlugin({
         if (config.order === 1 && ads.length > 1) {
             adIdx = Math.floor(Math.random() * ads.length)
         }
-        if (config.type === 0) {
+        if (config.type == 0) {
             backend.getCurrentChannel().chat(ads[adIdx])
         } else {
             backend.chat(ads[adIdx])

@@ -10,9 +10,9 @@ registerPlugin({
     // import modules
     const engine = require('engine');
     const event = require('event');
-    
+
     // listen for chat event
-    event.on('chat', ({client, text}) => {
+    event.on('chat', ({ client, text }) => {
         engine.log(`${client.name()} wrote ${text}`);
         client.chat(`Hi ${client.name()}, you just wrote: ${text}`);
     });
