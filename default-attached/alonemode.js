@@ -2,7 +2,7 @@ registerPlugin({
     name: 'AloneMode',
     version: '2.0',
     description: 'This script will save CPU and bandwidth by stopping or muting the bot when nobody is listening anyways.',
-    author: 'Michael Friese <michael@sinusbot.com>',
+    author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
     vars: [{
         name: 'mode',
         title: 'Mode',
@@ -21,7 +21,7 @@ registerPlugin({
 
     let isMuted = false
     let lastPosition = 0
-    let lastTitle
+    let lastTrack
 
     audio.setMute(false)
 
@@ -33,10 +33,11 @@ registerPlugin({
             if (mode == 0) {
                 audio.setMute(false)
             } else {
-                lastTitle.play()
-                audio.seek(lastPosition)
-                engine.log(`Seeking to ${lastPosition}`)
-
+                if (lastTrack) {
+                    lastTrack.play()
+                    audio.seek(lastPosition)
+                    engine.log(`Seeking to ${lastPosition} of track '${lastTrack.title()}'`)
+                }
             }
             return
         }
@@ -46,9 +47,9 @@ registerPlugin({
             if (mode == 0) {
                 audio.setMute(true)
             } else {
-                lastPosition = getPos()
-                engine.log(`Pos is ${lastPosition}`)
-                lastTitle = media.getCurrentTrack()
+                lastPosition = audio.getTrackPosition()
+                lastTrack = media.getCurrentTrack()
+                engine.log(`Position ${lastPosition} saved for track '${lastTrack.title()}'`)
                 media.stop()
             }
         }

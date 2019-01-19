@@ -2,14 +2,12 @@ registerPlugin({
     name: 'Bookmarks!',
     version: '2.0.1',
     description: 'Enter .bookmark to save the current position, enter .resume to seek to the bookmarked position.',
-    author: 'Michael Friese <michael@sinusbot.com> & mxschmitt <max@schmitt.mx>',
+    author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx> & mxschmitt <max@schmitt.mx>',
     vars: []
 }, () => {
     const store = require('store')
     const media = require('media')
     const audio = require('audio')
-    const event = require('event')
-
     const event = require("event")
 
     event.on("load", () => {
@@ -28,8 +26,8 @@ registerPlugin({
                     return
                 }
                 const pos = audio.getTrackPosition()
-                store.set(track.ID(), pos)
-                reply(`Position saved for track ${track.uuid} at ${pos}ms.`)
+                store.set(track.id(), pos)
+                reply(`Position saved for track '${track.title()}' at ${pos} ms`)
             })
 
         Command.createCommand("resume")
@@ -41,13 +39,13 @@ registerPlugin({
                 if (!track) {
                     return
                 }
-                const pos = store.get(track.ID())
+                const pos = store.get(track.id())
                 if (!pos) {
                     reply('No position found, sorry.')
                     return
                 }
                 audio.seek(pos)
-                reply(`Resumed at ${pos}ms.`)
+                reply(`Resumed at ${pos} ms of track '${track.title()}'`)
             })
     })
 })

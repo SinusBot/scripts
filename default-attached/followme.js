@@ -2,7 +2,7 @@ registerPlugin({
     name: 'Follow Me',
     version: '2.0',
     description: 'The bot will follow the movements of any of the clients given',
-    author: 'Michael Friese <michael@sinusbot.com>',
+    author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
     vars: [{
         name: 'clientUids',
         title: 'Comma-separated list of client-ids that the bot should follow',
@@ -20,10 +20,7 @@ registerPlugin({
     const uids = clientUids.split(',')
     event.on('clientMove', ({ client, toChannel }) => {
         if (uids.includes(client.uniqueID()) && toChannel) {
-            engine.log(`Following ${client.name()}`)
             backend.getBotClient().moveTo(toChannel)
         }
     })
-
-    engine.log('Follow Me initialized...')
 })
