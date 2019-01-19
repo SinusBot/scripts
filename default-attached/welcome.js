@@ -1,8 +1,8 @@
 registerPlugin({
     name: 'Welcome!',
-    version: '2.0',
+    version: '3.0',
     description: 'This plugin will let the bot greet everyone.',
-    author: 'Michael Friese <michael@sinusbot.com>',
+    author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
     vars: [{
         name: 'message',
         title: 'The message that should be displayed. (%n = nickname)',
@@ -16,18 +16,17 @@ registerPlugin({
             'Poke'
         ]
     }]
-}, function (sinusbot, config) {
-    var event = require('event');
-    event.on('clientMove', function (ev) {
-        var msg = config.message;
-        msg = msg.replace(/%n/g, ev.client.name());
-        if (ev.fromChannel == undefined) {
-            if (config.type == 0) {
-                ev.client.chat(msg);
+}, (_, { message, type }) => {
+    const event = require('event')
+
+    event.on('clientMove', ({ client, fromChannel }) => {
+        let msg = message.replace("%n", client.name())
+        if (!fromChannel) {
+            if (type == 0) {
+                client.chat(msg)
             } else {
-                ev.client.poke(msg);
+                client.poke(msg)
             }
-            return;
         }
-    });
-});
+    })
+})
