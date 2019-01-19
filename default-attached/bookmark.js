@@ -1,6 +1,6 @@
 registerPlugin({
     name: 'Bookmarks!',
-    version: '2.0.1',
+    version: '3.0',
     description: 'Enter .bookmark to save the current position, enter .resume to seek to the bookmarked position.',
     author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx> & mxschmitt <max@schmitt.mx>',
     vars: []

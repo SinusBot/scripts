@@ -1,6 +1,6 @@
 registerPlugin({
     name: 'Advertising (Text)',
-    version: '2.0',
+    version: '3.0',
     description: 'This script will announce one of the configured lines every x seconds.',
     author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
     vars: [{

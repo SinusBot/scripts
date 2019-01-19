@@ -1,6 +1,6 @@
 registerPlugin({
     name: 'Follow Me',
-    version: '2.0',
+    version: '3.0',
     description: 'The bot will follow the movements of any of the clients given',
     author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
     vars: [{

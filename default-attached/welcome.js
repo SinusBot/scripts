@@ -1,6 +1,6 @@
 registerPlugin({
     name: 'Welcome!',
-    version: '2.0',
+    version: '3.0',
     description: 'This plugin will let the bot greet everyone.',
     author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
     vars: [{

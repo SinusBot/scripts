@@ -1,6 +1,6 @@
 registerPlugin({
     name: 'No Recording!',
-    version: '2.0',
+    version: '3.0',
     description: 'This script will kick anyone who attempts to record.',
     author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
     vars: [{
