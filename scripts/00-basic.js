@@ -1,4 +1,3 @@
-// @ts-check
 registerPlugin({
     name: 'Example script',
     version: '1.0.0',
