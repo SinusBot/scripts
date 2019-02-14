@@ -2,7 +2,7 @@ registerPlugin({
     name: 'Bookmarks!',
     version: '3.0',
     description: 'Enter .bookmark to save the current position, enter .resume to seek to the bookmarked position.',
-    author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx> & mxschmitt <max@schmitt.mx>',
+    author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
     vars: []
 }, () => {
     const store = require('store')
@@ -32,8 +32,7 @@ registerPlugin({
 
         Command.createCommand("resume")
             .help("resumes to the bookmarked position")
-            .manual("resumes to the bookmarked position")
-            .manual("by using the 'seek' command, it can be saved")
+            .manual("resumes to the bookmarked position (use bookmark command to set)")
             .exec((client, args, reply) => {
                 const track = media.getCurrentTrack()
                 if (!track) {

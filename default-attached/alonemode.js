@@ -12,7 +12,7 @@ registerPlugin({
             'stop playback'
         ]
     }]
-}, (_, { mode }) => {
+}, (_, {mode}) => {
     const engine = require('engine')
     const backend = require('backend')
     const event = require('event')
@@ -26,11 +26,13 @@ registerPlugin({
     audio.setMute(false)
 
     event.on('clientMove', () => {
-        let currentChannelClientCount = backend.getCurrentChannel().getClientCount()
-        if (currentChannelClientCount > 1 && isMuted) {
+        let clients = backend.getCurrentChannel().getClientCount()
+
+        if (clients > 1 && isMuted) {
             isMuted = false
             engine.log('Ending AloneMode...')
-            if (mode == 0) {
+
+            if (mode == '0') {
                 audio.setMute(false)
             } else {
                 if (lastTrack) {
@@ -39,12 +41,11 @@ registerPlugin({
                     engine.log(`Seeking to ${lastPosition} of track '${lastTrack.title()}'`)
                 }
             }
-            return
-        }
-        if (currentChannelClientCount <= 1 && audio.isPlaying()) {
+        } else if (clients <= 1 && audio.isPlaying()) {
             isMuted = true
             engine.log('Starting AloneMode...')
-            if (mode == 0) {
+            
+            if (mode == '0') {
                 audio.setMute(true)
             } else {
                 lastPosition = audio.getTrackPosition()

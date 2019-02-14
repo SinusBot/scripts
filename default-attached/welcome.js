@@ -20,9 +20,9 @@ registerPlugin({
     const event = require('event')
 
     event.on('clientMove', ({ client, fromChannel }) => {
-        let msg = message.replace("%n", client.name())
+        let msg = message.replace('%n', client.name())
         if (!fromChannel) {
-            if (type == 0) {
+            if (type == '0') {
                 client.chat(msg)
             } else {
                 client.poke(msg)

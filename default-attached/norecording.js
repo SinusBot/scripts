@@ -13,7 +13,7 @@ registerPlugin({
 
     const kickMessage = config.kickMessage || 'No recording on our server!'
 
-    event.on('clientRecord', ev => {
-        ev.kickFromServer(kickMessage)
+    event.on('clientRecord', client => {
+        client.kickFromServer(kickMessage)
     })
 })

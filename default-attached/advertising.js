@@ -12,15 +12,17 @@ registerPlugin({
         name: 'interval',
         title: 'Interval (in seconds)',
         type: 'number',
-        placeholder: '5'
+        placeholder: '5',
+        default: 5
     }, {
         name: 'order',
         title: 'Order',
         type: 'select',
         options: [
-            'default (line by line)',
+            'line by line (default)',
             'random'
-        ]
+        ],
+        default: '0'
     }, {
         name: 'type',
         title: 'Broadcast-Type',
@@ -28,39 +30,44 @@ registerPlugin({
         options: [
             'Channel',
             'Server'
-        ]
+        ],
+        default: '0'
     }]
-}, (_, config) => {
+}, (_, {ads, order, type, interval}) => {
     const backend = require('backend')
     const engine = require('engine')
 
-    const ads = (config && config.ads) ? config.ads.split('\n').map(e => e.trim().replace(/\r/g, '')) : []
+    ads = ads ? ads.split('\n').map(line => line.trim().replace(/\r/g, '')) : []
 
-    let counter = 0
     if (ads.length === 0) {
-        engine.log("There were no ads configured.")
+        engine.log('There are no ads configured.')
+        return
+    }
+    if (interval <= 3) {
+        engine.log('The interval is too small, use a value bigger than 3 seconds.')
         return
     }
 
-    if (config.Interval < 3) {
-        engine.log("The intervall is too small, use > 3 not to be banned from the server")
-        return
-    }
-    
+    const RANDOM = '1';
+    const SERVER = '1';
+
+    let index = -1
+
     setInterval(() => {
-        let adIdx = counter % ads.length
-        // prevent overflow of the counter
-        if (counter % ads.length === 0) {
-            adIdx = 0
+        switch (order) {
+            case RANDOM:
+                index = Math.floor(Math.random() * ads.length)
+                break
+            default:
+                index = (++index % ads.length)
         }
-        if (config.order === 1 && ads.length > 1) {
-            adIdx = Math.floor(Math.random() * ads.length)
+
+        switch (type) {
+            case SERVER:
+                backend.chat(ads[index])
+                break
+            default:
+                backend.getCurrentChannel().chat(ads[index])
         }
-        if (config.type == 0) {
-            backend.getCurrentChannel().chat(ads[adIdx])
-        } else {
-            backend.chat(ads[adIdx])
-        }
-        counter++
-    }, config.interval * 1000)
+    }, interval * 1000)
 })

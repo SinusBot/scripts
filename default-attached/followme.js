@@ -5,19 +5,20 @@ registerPlugin({
     author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
     vars: [{
         name: 'clientUids',
-        title: 'Comma-separated list of client-ids that the bot should follow',
+        title: 'Comma-separated list of client-UIDs that the bot should follow',
         type: 'string'
     }]
-}, (_, { clientUids }) => {
+}, (_, {clientUids}) => {
     const engine = require('engine')
     const backend = require('backend')
     const event = require('event')
 
     if (!clientUids) {
-        engine.log('Invalid clientUids')
+        engine.log('No client-UIDs set.')
         return
     }
-    const uids = clientUids.split(',')
+
+    const uids = clientUids.replace(', ', ',').split(',')
     event.on('clientMove', ({ client, toChannel }) => {
         if (uids.includes(client.uniqueID()) && toChannel) {
             backend.getBotClient().moveTo(toChannel)
