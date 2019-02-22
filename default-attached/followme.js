@@ -1,6 +1,7 @@
 registerPlugin({
     name: 'Follow Me',
     version: '3.0',
+    backends: ['ts3', 'discord'],
     description: 'The bot will follow the movements of any of the clients given',
     author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
     vars: [{
@@ -18,9 +19,9 @@ registerPlugin({
         return
     }
 
-    const uids = clientUids.replace(', ', ',').split(',')
+    const uids = clientUids.trim().split(',')
     event.on('clientMove', ({ client, toChannel }) => {
-        if (uids.includes(client.uniqueID()) && toChannel) {
+        if (toChannel && uids.includes(client.uid())) {
             backend.getBotClient().moveTo(toChannel)
         }
     })

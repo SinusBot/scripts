@@ -1,6 +1,7 @@
 registerPlugin({
     name: 'AloneMode',
     version: '3.0',
+    backends: ['ts3', 'discord'],
     description: 'This script will save CPU and bandwidth by stopping or muting the bot when nobody is listening anyways.',
     author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
     vars: [{
@@ -19,6 +20,8 @@ registerPlugin({
     const audio = require('audio')
     const media = require('media')
 
+    const MUTE_ONLY = '1'
+
     let isMuted = false
     let lastPosition = 0
     let lastTrack
@@ -32,7 +35,7 @@ registerPlugin({
             isMuted = false
             engine.log('Ending AloneMode...')
 
-            if (mode == '0') {
+            if (mode == MUTE_ONLY) {
                 audio.setMute(false)
             } else {
                 if (lastTrack) {
@@ -45,7 +48,7 @@ registerPlugin({
             isMuted = true
             engine.log('Starting AloneMode...')
             
-            if (mode == '0') {
+            if (mode == MUTE_ONLY) {
                 audio.setMute(true)
             } else {
                 lastPosition = audio.getTrackPosition()
