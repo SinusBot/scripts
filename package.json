@@ -7,6 +7,6 @@
   "author": "SinusBot",
   "license": "MIT",
   "devDependencies": {
-    "sinusbot-scripting-engine": "^1.0.5"
+    "sinusbot-scripting-engine": "^1.0.6"
   }
 }
