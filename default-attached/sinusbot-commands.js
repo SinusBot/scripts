@@ -663,8 +663,8 @@ registerPlugin({
 
         command.createCommand('registration')
         .addArgument(command.createArgument('string').setName('value'))
-        .help('Change command prefix')
-        .manual('Changes the prefix for all core commands to <new prefix>, default is "!".')
+        .help('Enable / disable user registration via chat')
+        .manual('Enables / disables user registration via chat. Value should be either `enable` or `disable`.')
         .checkPermission(requirePrivileges(EDITBOT))
         // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
