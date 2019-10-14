@@ -111,9 +111,10 @@ registerPlugin({
     const REACTION_PREV = '⏮';
     const REACTION_PLAYPAUSE = '⏯';
     const REACTION_NEXT = '⏭';
+    const REACTION_SUCCESS = '✅';
 
     // for join/leave
-    const ERROR_BOT_NULL = 'Unable to change channel :frowning:\nTry to set a *Default Channel* in the webinterface and click save.'
+    const ERROR_BOT_NULL = ERROR_PREFIX+'Unable to change channel.\nTry to set a *Default Channel* in the webinterface and click save.'
     let bot = backend.getBotClient();
 
     // restore lastEmbeds
@@ -718,7 +719,7 @@ registerPlugin({
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(msg:string)=>void} */reply, /** @implements {Message} */ev) => {
             var channel = client.getChannels()[0]
             if (!channel) {
-                return reply('I\'m unable to join your channel :frowning:')
+                return reply(ERROR_PREFIX+'I\'m unable to join your channel :(')
             }
 
             bot = backend.getBotClient() || bot
@@ -1029,7 +1030,7 @@ registerPlugin({
             // @ts-ignore
             let message = ev.message;
             if (message) {
-                message.createReaction('✅');
+                message.createReaction(REACTION_SUCCESS);
             }
         }
     }
