@@ -137,7 +137,6 @@ registerPlugin({
         .addArgument(command.createArgument('string').setName('username'))
         .help('Register a new user')
         .manual('Registers a new user bound to the Account you are using. This account has no privileges by default but can be edited by the bot administrators.')
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             if (!engine.registrationEnabled()) {
                 reply('Registration is disabled.');
@@ -276,7 +275,6 @@ registerPlugin({
         .help('Play the next track')
         .manual('Plays the next track (only when a playlist or queue is active).')
         .checkPermission(requirePrivileges(PLAYBACK))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             media.playNext();
             successReaction(ev);
@@ -287,7 +285,6 @@ registerPlugin({
         .help('Play the previous track')
         .manual('Plays the previous track (only when a playlistis active).')
         .checkPermission(requirePrivileges(PLAYBACK))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             media.playPrevious();
             successReaction(ev);
@@ -299,7 +296,6 @@ registerPlugin({
         .help('Search for tracks')
         .manual('Searches for tracks, returns 20 results at most.')
         .checkPermission(requirePrivileges(PLAYBACK, ENQUEUE))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no searchstring given
             if (!args.searchstring) {
@@ -325,7 +321,6 @@ registerPlugin({
         .help('Play a track by its id or name')
         .manual('Plays a track by its id or searches for a track and plays the first match.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no idORsearchstring given
             if (!args.idORsearchstring) {
@@ -355,7 +350,6 @@ registerPlugin({
         .help('Enqueue a track or resume queue')
         .manual('Enqueue a track by its id or search for a track and enqueue the first match. When no track is provided it wil resume the queue.')
         .checkPermission(requirePrivileges(PLAYBACK, ENQUEUE))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             if (!args.idORsearchstring) {
                 if (!audio.isPlaying()) {
@@ -386,7 +380,6 @@ registerPlugin({
         .help('Prepends a track to the queue')
         .manual('Prepends a track by its id or searches for a track and prepends the first match to the queue.')
         .checkPermission(requirePrivileges(ENQUEUENEXT))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no idORsearchstring given
             if (!args.idORsearchstring) {
@@ -414,7 +407,6 @@ registerPlugin({
         .help('Stop playback')
         .manual('Stops playback.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             media.stop();
             successReaction(ev);
@@ -424,7 +416,6 @@ registerPlugin({
         .help('Stop playback and remove idle-track')
         .manual('Stops playback and removes idle-track.')
         .checkPermission(requirePrivileges(PLAYBACK|EDITBOT))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             media.stop();
             media.clearIdleTrack();
@@ -437,7 +428,6 @@ registerPlugin({
         .help('Change the volume')
         .manual('Changes the volume.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             let value = args.value;
             let volume = audio.getVolume();
@@ -475,7 +465,6 @@ registerPlugin({
         .help('Stream a url')
         .manual('Streams from <url>; this may be http-streams like shoutcast / icecast or just remote soundfiles.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no url given
             if (!args.url) {
@@ -495,7 +484,6 @@ registerPlugin({
         .help('Say a text via TTS')
         .manual('Uses text-to-speech (if configured) to say the given text.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no text given
             if (!args.text) {
@@ -513,7 +501,6 @@ registerPlugin({
         .help('Say a text via TTS with given locale')
         .manual('Uses text-to-speech (if configured) to say the given text with a given locale.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no locale/text given
             if (!args.locale || !args.text) {
@@ -530,7 +517,6 @@ registerPlugin({
         .help('Set the TTS url.')
         .manual('Sets the TTS url.')
         .checkPermission(requirePrivileges(EDITBOT))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no url given
             if (!args.url) {
@@ -547,7 +533,6 @@ registerPlugin({
         .help('Set the TTS locale.')
         .manual('Sets the TTS locale.')
         .checkPermission(requirePrivileges(EDITBOT))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no locale given
             if (!args.locale) {
@@ -564,7 +549,6 @@ registerPlugin({
         .help('Play <url> via youtube-dl')
         .manual('Plays <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no url given
             if (!args.url) {
@@ -584,7 +568,6 @@ registerPlugin({
         .help('Download and play <url> via youtube-dl')
         .manual('Plays <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts; additionally, the file will be stored.')
         .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILE))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no url given
             if (!args.url) {
@@ -604,7 +587,6 @@ registerPlugin({
         .help('Enqueue <url> via youtube-dl')
         .manual('Enqueues <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts.')
         .checkPermission(requirePrivileges(PLAYBACK, ENQUEUE))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no url given
             if (!args.url) {
@@ -624,7 +606,6 @@ registerPlugin({
         .help('Download and enqueue <url> via youtube-dl')
         .manual('Enqueues <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts; additionally, the file will be stored.')
         .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILE, ENQUEUE|UPLOAD_FILE))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no url given
             if (!args.url) {
@@ -643,7 +624,6 @@ registerPlugin({
         .help('Toggle shuffle')
         .manual('Toggles shuffle.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             audio.setShuffle(!audio.isShuffle());
             reply(SUCCESS_PREFIX + `Shuffle is now ${audio.isShuffle() ? 'en' : 'dis'}abled.`);
@@ -654,7 +634,6 @@ registerPlugin({
         .help('Toggle repeat')
         .manual('Toggles repeat.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             audio.setRepeat(!audio.isRepeat());
             reply(SUCCESS_PREFIX + `Repeat is now ${audio.isShuffle() ? 'en' : 'dis'}abled.`);
@@ -666,7 +645,6 @@ registerPlugin({
         .help('Enable / disable user registration via chat')
         .manual('Enables / disables user registration via chat. Value should be either `enable` or `disable`.')
         .checkPermission(requirePrivileges(EDITBOT))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             switch (args.value) {
             case "enable":
@@ -689,7 +667,6 @@ registerPlugin({
         .help('Change command prefix')
         .manual('Changes the prefix for all core commands to <new prefix>, default is "!".')
         .checkPermission(requirePrivileges(EDITBOT))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             // print syntax if no url given
             if (!args.prefix) {
@@ -705,7 +682,6 @@ registerPlugin({
         command.createCommand('ping')
         .help('pong')
         .manual('Responds with "PONG".')
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             reply(`PONG`);
             successReaction(ev);
@@ -715,7 +691,6 @@ registerPlugin({
         .help('Show version')
         .manual('Shows the SinusBot version.')
         .checkPermission(requirePrivileges(EDITBOT))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             reply(`SinusBot v${engine.version()}\ncommand.js v${command.getVersion()}`);
             successReaction(ev);
@@ -725,7 +700,6 @@ registerPlugin({
         .help('Reload scripts')
         .manual('Reloads scripts.\nPlease Note: New scripts require a complete sinusbot restart.')
         .checkPermission(requirePrivileges(EDITBOT))
-        // eslint-disable-next-line no-unused-vars
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
             let success = engine.reloadScripts();
             if (success) {
