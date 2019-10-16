@@ -255,6 +255,9 @@ registerPlugin({
                     .then(() => createReaction(channel_id, id, REACTION_PLAYPAUSE))
                     .then(() => wait(150))
                     .then(() => createReaction(channel_id, id, REACTION_NEXT));
+
+                    // store lastEmbeds
+                    store.set('lastEmbeds', lastEmbeds);
                 });
                 successReaction(ev);
             });
@@ -342,6 +345,34 @@ registerPlugin({
 
             track.play();
             reply(`Playing ${formatTrack(track)}`);
+            successReaction(ev);
+        });
+
+        command.createCommand('playlist')
+        .addArgument(command.createArgument('rest').setName('playlistname'))
+        .help('Start playing back the playlist <playlistname>')
+        .manual('starts playing back the playlist <playlistname>.')
+        .checkPermission(requirePrivileges(PLAYBACK))
+        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+            // print syntax if no playlistname given
+            if (!args.playlistname) {
+                reply(USAGE_PREFIX + 'playlist <playlistname>');
+                return;
+            }
+
+            const match = media.getPlaylists().find(playlist => {
+                // case insensitive equals
+                return playlist.name() == args.playlistname || playlist.name().localeCompare(args.playlistname, undefined, { sensitivity: 'accent' }) === 0
+            });
+
+            if (!match) {
+                reply('Sorry, no matching playlist found.');
+                successReaction(ev);
+                return;
+            }
+            
+            media.playlistPlayById(match, 0);
+
             successReaction(ev);
         });
 
@@ -702,6 +733,7 @@ registerPlugin({
         .manual('Reloads scripts.\nPlease Note: New scripts require a complete sinusbot restart.')
         .checkPermission(requirePrivileges(EDITBOT))
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+            reply('reloading...');
             let success = engine.reloadScripts();
             if (success) {
                 reply(SUCCESS_PREFIX + `Scripts reloaded.\nNew scripts require a complete sinusbot restart.`);
@@ -797,14 +829,9 @@ registerPlugin({
                         if (audio.isPlaying()) {
                             media.stop();
                         } else {
-                            // is something in queue? try to resume
-                            if (media.getQueue().length !== 0) {
-                                media.resumeQueue();
-                                return;
-                            }
                             if (!track) return;
+                            const pos = audio.getTrackPosition();
 
-                            const pos = audio.getTrackPosition()
                             if (pos && pos < track.duration()) {
                                 // continue playing at last pos
                                 audio.setMute(true);
@@ -813,6 +840,7 @@ registerPlugin({
                                 audio.setMute(false);
                             } else {
                                 // or start from beginning if it already ended
+                                audio.seek(0);
                                 track.play();
                             }
                         }
