@@ -504,7 +504,7 @@ registerPlugin({
                 return;
             }
 
-            if (!media.ytStream(args.url)) {
+            if (!media.ytStream(stripURL(args.url))) {
                 reply(ERROR_PREFIX + 'Invalid URL.');
                 return;
             }
@@ -556,7 +556,7 @@ registerPlugin({
                 return;
             }
 
-            audio.setTTSURL(args.url);
+            audio.setTTSURL(stripURL(args.url));
             successReaction(ev);
         });
 
@@ -588,7 +588,7 @@ registerPlugin({
                 return;
             }
 
-            if (!media.yt(args.url)) {
+            if (!media.yt(stripURL(args.url))) {
                 reply(ERROR_PREFIX + 'Invalid URL.');
                 return;
             }
@@ -607,7 +607,7 @@ registerPlugin({
                 return;
             }
 
-            if (!media.ytdl(args.url, true)) {
+            if (!media.ytdl(stripURL(args.url), true)) {
                 reply(ERROR_PREFIX + 'Invalid URL.');
                 return;
             }
@@ -626,7 +626,7 @@ registerPlugin({
                 return;
             }
 
-            if (!media.enqueueYt(args.url)) {
+            if (!media.enqueueYt(stripURL(args.url))) {
                 reply(ERROR_PREFIX + 'Invalid URL.');
                 return;
             }
@@ -645,7 +645,7 @@ registerPlugin({
                 return;
             }
 
-            if (!media.enqueueYtdl(args.url)) {
+            if (!media.enqueueYtdl(stripURL(args.url))) {
                 reply(ERROR_PREFIX + 'Invalid URL.');
                 return;
             }
@@ -700,7 +700,7 @@ registerPlugin({
         .manual('Changes the prefix for all core commands to <new prefix>, default is "!".')
         .checkPermission(requirePrivileges(EDITBOT))
         .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
-            // print syntax if no url given
+            // print syntax if no prefix given
             if (!args.prefix) {
                 reply(USAGE_PREFIX + 'prefix <new prefix>');
                 return;
@@ -1009,6 +1009,22 @@ registerPlugin({
         let title = track.tempTitle() || track.title();
         let artist = track.tempArtist() || track.artist();
         return artist ? `${artist} - ${title}` : title;
+    }
+
+    /**
+     * Removes TeamSpeaks URL bb-code from a given string.
+     *
+     * @param {string} str
+     * @returns {string} str without [URL][/URL]
+     */
+    function stripURL(str) {
+        if (typeof str !== 'string') return str;
+
+        const match = str.match(/\[URL\](.+)\[\/URL\]/);
+        if (match && match.length >= 2) {
+            return match[1];
+        }
+        return str;
     }
 
     /**
