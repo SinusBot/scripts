@@ -321,7 +321,7 @@ registerPlugin({
 
         command.createCommand('play')
         .alias('p')
-        .addArgument(command.createArgument('rest').setName('idORsearchstring'))
+        .addArgument(command.createArgument('rest').setName('idORsearchstring', 'searchstring / uuid'))
         .help('Play a track by its id or name')
         .manual('Plays a track by its id or searches for a track and plays the first match.')
         .checkPermission(requirePrivileges(PLAYBACK))
@@ -378,7 +378,7 @@ registerPlugin({
 
         command.createCommand('queue')
         .alias('q')
-        .addArgument(command.createArgument('rest').setName('idORsearchstring').optional(true))
+        .addArgument(command.createArgument('rest').setName('idORsearchstring', 'searchstring / uuid').optional(true))
         .help('Enqueue a track or resume queue')
         .manual('Enqueue a track by its id or search for a track and enqueue the first match. When no track is provided it wil resume the queue.')
         .checkPermission(requirePrivileges(PLAYBACK, ENQUEUE))
@@ -408,7 +408,7 @@ registerPlugin({
 
         command.createCommand('queuenext')
         .alias('qnext', 'qn')
-        .addArgument(command.createArgument('rest').setName('idORsearchstring'))
+        .addArgument(command.createArgument('rest').setName('idORsearchstring', 'searchstring / uuid'))
         .help('Prepends a track to the queue')
         .manual('Prepends a track by its id or searches for a track and prepends the first match to the queue.')
         .checkPermission(requirePrivileges(ENQUEUENEXT))
