@@ -672,6 +672,89 @@ registerPlugin({
             successReaction(ev);
         });
 
+        if (engine.getBackend() == 'ts3') {
+            command.createCommand('sub')
+            .help('Subscribe to bot')
+            .manual('Subscribes to the bot. (subscription transfer-mode only)')
+            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+                if (!engine.isSubscriptionMode()) {
+                    reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
+                    return;
+                }
+                client.subscribe(true);
+                successReaction(ev);
+            });
+
+            command.createCommand('unsub')
+            .help('Unsubscribe from bot')
+            .manual('Unsubscribes from the bot. (subscription transfer-mode only)')
+            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+                if (!engine.isSubscriptionMode()) {
+                    reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
+                    return;
+                }
+                client.subscribe(false);
+                successReaction(ev);
+            });
+
+            command.createCommand('subchan')
+            .help('Add subscription for channel')
+            .manual('Adds subscription for the channel the user is currently in. (subscription transfer-mode only)')
+            .checkPermission(requirePrivileges(EDITBOT))
+            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+                if (!engine.isSubscriptionMode()) {
+                    reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
+                    return;
+                }
+                client.getChannels()[0].subscribe(true);
+                successReaction(ev);
+            });
+
+            command.createCommand('unsubchan')
+            .help('Remove subscription for channel')
+            .manual('Removes subscription for the channel the user is currently in. (subscription transfer-mode only)')
+            .checkPermission(requirePrivileges(EDITBOT))
+            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+                if (!engine.isSubscriptionMode()) {
+                    reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
+                    return;
+                }
+                client.getChannels()[0].subscribe(false);
+                successReaction(ev);
+            });
+
+            command.createCommand('mode')
+            .addArgument(command.createArgument('string').setName('mode'))
+            .help('Change Transmit-Mode')
+            .manual('Changes Transmit-Mode; 0 = to channel, 1 = subscription mode')
+            .checkPermission(requirePrivileges(EDITBOT))
+            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+                let mode = args.mode;
+                if (typeof mode === 'string') {
+                    mode = mode.toLowerCase();
+                }
+
+                switch (mode) {
+                case "0":
+                case "chan":
+                case "channel":
+                    //FIXME: set transmit mode
+                    reply(SUCCESS_PREFIX + 'Transmit-Mode is now set to Channel (default).');
+                    successReaction(ev);
+                    break;
+                case "1":
+                case "sub":
+                case "subscription":
+                    //FIXME: set transmit mode
+                    reply(SUCCESS_PREFIX + 'Transmit-Mode is now set to Subscription.');
+                    successReaction(ev);
+                    break;
+                default:
+                    reply(`Transmit-Mode is currently set to ${engine.isSubscriptionMode() ? 'Subscription' : 'Channel (default)'}.\n` + USAGE_PREFIX + 'mode <0|chan(nel)|1|sub(scription)>');
+                }
+            });
+        }
+
         command.createCommand('registration')
         .addArgument(command.createArgument('string').setName('value'))
         .help('Enable / disable user registration via chat')
