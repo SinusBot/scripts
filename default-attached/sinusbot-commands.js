@@ -371,7 +371,7 @@ registerPlugin({
                 return;
             }
             
-            media.playlistPlayById(match, 0);
+            media.playlistPlayByID(match, 0);
 
             successReaction(ev);
         });
