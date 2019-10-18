@@ -738,14 +738,14 @@ registerPlugin({
                 case "0":
                 case "chan":
                 case "channel":
-                    //FIXME: set transmit mode
+                    engine.setSubscriptionMode(false);
                     reply(SUCCESS_PREFIX + 'Transmit-Mode is now set to Channel (default).');
                     successReaction(ev);
                     break;
                 case "1":
                 case "sub":
                 case "subscription":
-                    //FIXME: set transmit mode
+                    engine.setSubscriptionMode(true);
                     reply(SUCCESS_PREFIX + 'Transmit-Mode is now set to Subscription.');
                     successReaction(ev);
                     break;
