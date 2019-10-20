@@ -1,6 +1,12 @@
 {
     "compilerOptions": {
+        "checkJs": true,
         "target": "es2018",
-        "checkJs": true
-    }
+        "types" : ["sinusbot-scripting-engine"]
+    },
+    "typeAcquisition": {"enable": false, "include": ["sinusbot-scripting-engine"]},
+    "exclude": [
+        "node_modules",
+        "**/node_modules/*"
+    ]
 }
