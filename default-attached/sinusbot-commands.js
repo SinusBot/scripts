@@ -138,7 +138,7 @@ registerPlugin({
         .addArgument(command.createArgument('string').setName('username'))
         .help('Register a new user')
         .manual('Registers a new user bound to the Account you are using. This account has no privileges by default but can be edited by the bot administrators.')
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             if (!engine.registrationEnabled()) {
                 reply('Registration is disabled.');
                 return;
@@ -182,7 +182,7 @@ registerPlugin({
         .checkPermission(client => {
             return getUserByUid(client.uid()) != null;
         })
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no value given
             if (!args.value) {
                 reply(USAGE_PREFIX + 'password <value>\n'+ WARNING_PREFIX + 'Don\'t use this command in a public channel.');
@@ -210,7 +210,7 @@ registerPlugin({
             command.createCommand('playing')
             .help('Show what\'s currantly playing')
             .manual('Show what\'s currantly playing')
-            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+            .exec((client, args, reply, ev) => {
                 if (!audio.isPlaying()) {
                     return reply('There is nothing playing at the moment.');
                 }
@@ -265,8 +265,7 @@ registerPlugin({
             command.createCommand('playing')
             .help('Show what\'s currantly playing')
             .manual('Show what\'s currantly playing')
-            // eslint-disable-next-line no-unused-vars
-            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+            .exec((client, args, reply, ev) => {
                 if (!audio.isPlaying()) {
                     return reply('There is nothing playing at the moment.');
                 }
@@ -279,7 +278,7 @@ registerPlugin({
         .help('Play the next track')
         .manual('Plays the next track (only when a playlist or queue is active).')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             media.playNext();
             successReaction(ev);
         });
@@ -289,7 +288,7 @@ registerPlugin({
         .help('Play the previous track')
         .manual('Plays the previous track (only when a playlistis active).')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             media.playPrevious();
             successReaction(ev);
         });
@@ -300,7 +299,7 @@ registerPlugin({
         .help('Search for tracks')
         .manual('Searches for tracks, returns 20 results at most.')
         .checkPermission(requirePrivileges(PLAYBACK, ENQUEUE))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no searchstring given
             if (!args.searchstring) {
                 reply(USAGE_PREFIX + 'search <searchstring>');
@@ -325,7 +324,7 @@ registerPlugin({
         .help('Play a track by its id or name')
         .manual('Plays a track by its id or searches for a track and plays the first match.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no idORsearchstring given
             if (!args.idORsearchstring) {
                 reply(USAGE_PREFIX + 'play <searchstring / uuid>');
@@ -353,7 +352,7 @@ registerPlugin({
         .help('Start playing back the playlist <playlistname>')
         .manual('starts playing back the playlist <playlistname>.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no playlistname given
             if (!args.playlistname) {
                 reply(USAGE_PREFIX + 'playlist <playlistname>');
@@ -382,7 +381,7 @@ registerPlugin({
         .help('Enqueue a track or resume queue')
         .manual('Enqueue a track by its id or search for a track and enqueue the first match. When no track is provided it wil resume the queue.')
         .checkPermission(requirePrivileges(PLAYBACK, ENQUEUE))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             if (!args.idORsearchstring) {
                 if (!audio.isPlaying()) {
                     media.playQueueNext();
@@ -412,7 +411,7 @@ registerPlugin({
         .help('Prepends a track to the queue')
         .manual('Prepends a track by its id or searches for a track and prepends the first match to the queue.')
         .checkPermission(requirePrivileges(ENQUEUENEXT))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no idORsearchstring given
             if (!args.idORsearchstring) {
                 reply(USAGE_PREFIX + 'queuenext <searchstring / uuid>');
@@ -439,7 +438,7 @@ registerPlugin({
         .help('Stop playback')
         .manual('Stops playback.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             media.stop();
             successReaction(ev);
         });
@@ -448,7 +447,7 @@ registerPlugin({
         .help('Stop playback and remove idle-track')
         .manual('Stops playback and removes idle-track.')
         .checkPermission(requirePrivileges(PLAYBACK|EDITBOT))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             media.stop();
             media.clearIdleTrack();
             successReaction(ev);
@@ -460,7 +459,7 @@ registerPlugin({
         .help('Change the volume')
         .manual('Changes the volume.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             let value = args.value;
             let volume = audio.getVolume();
 
@@ -497,7 +496,7 @@ registerPlugin({
         .help('Stream a url')
         .manual('Streams from <url>; this may be http-streams like shoutcast / icecast or just remote soundfiles.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no url given
             if (!args.url) {
                 reply(USAGE_PREFIX + 'stream <url>');
@@ -516,7 +515,7 @@ registerPlugin({
         .help('Say a text via TTS')
         .manual('Uses text-to-speech (if configured) to say the given text.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no text given
             if (!args.text) {
                 reply(USAGE_PREFIX + 'say <text>');
@@ -533,7 +532,7 @@ registerPlugin({
         .help('Say a text via TTS with given locale')
         .manual('Uses text-to-speech (if configured) to say the given text with a given locale.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no locale/text given
             if (!args.locale || !args.text) {
                 reply(USAGE_PREFIX + 'sayex <locale> <text>');
@@ -549,7 +548,7 @@ registerPlugin({
         .help('Set the TTS url.')
         .manual('Sets the TTS url.')
         .checkPermission(requirePrivileges(EDITBOT))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no url given
             if (!args.url) {
                 reply(USAGE_PREFIX + 'ttsurl <url>');
@@ -565,7 +564,7 @@ registerPlugin({
         .help('Set the TTS locale.')
         .manual('Sets the TTS locale.')
         .checkPermission(requirePrivileges(EDITBOT))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no locale given
             if (!args.locale) {
                 reply(USAGE_PREFIX + 'ttslocale <locale>');
@@ -581,7 +580,7 @@ registerPlugin({
         .help('Play <url> via youtube-dl')
         .manual('Plays <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no url given
             if (!args.url) {
                 reply(USAGE_PREFIX + 'yt <url>');
@@ -600,7 +599,7 @@ registerPlugin({
         .help('Download and play <url> via youtube-dl')
         .manual('Plays <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts; additionally, the file will be stored.')
         .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILE))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no url given
             if (!args.url) {
                 reply(USAGE_PREFIX + 'ytdl <url>');
@@ -619,7 +618,7 @@ registerPlugin({
         .help('Enqueue <url> via youtube-dl')
         .manual('Enqueues <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts.')
         .checkPermission(requirePrivileges(PLAYBACK, ENQUEUE))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no url given
             if (!args.url) {
                 reply(USAGE_PREFIX + 'qyt <url>');
@@ -638,7 +637,7 @@ registerPlugin({
         .help('Download and enqueue <url> via youtube-dl')
         .manual('Enqueues <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts; additionally, the file will be stored.')
         .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILE, ENQUEUE|UPLOAD_FILE))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no url given
             if (!args.url) {
                 reply(USAGE_PREFIX + 'qytdl <url>');
@@ -656,7 +655,7 @@ registerPlugin({
         .help('Toggle shuffle')
         .manual('Toggles shuffle.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             audio.setShuffle(!audio.isShuffle());
             reply(SUCCESS_PREFIX + `Shuffle is now ${audio.isShuffle() ? 'en' : 'dis'}abled.`);
             successReaction(ev);
@@ -666,7 +665,7 @@ registerPlugin({
         .help('Toggle repeat')
         .manual('Toggles repeat.')
         .checkPermission(requirePrivileges(PLAYBACK))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             audio.setRepeat(!audio.isRepeat());
             reply(SUCCESS_PREFIX + `Repeat is now ${audio.isShuffle() ? 'en' : 'dis'}abled.`);
             successReaction(ev);
@@ -676,7 +675,7 @@ registerPlugin({
             command.createCommand('sub')
             .help('Subscribe to bot')
             .manual('Subscribes to the bot. (subscription transfer-mode only)')
-            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+            .exec((client, args, reply, ev) => {
                 if (!engine.isSubscriptionMode()) {
                     reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
                     return;
@@ -688,7 +687,7 @@ registerPlugin({
             command.createCommand('unsub')
             .help('Unsubscribe from bot')
             .manual('Unsubscribes from the bot. (subscription transfer-mode only)')
-            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+            .exec((client, args, reply, ev) => {
                 if (!engine.isSubscriptionMode()) {
                     reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
                     return;
@@ -701,7 +700,7 @@ registerPlugin({
             .help('Add subscription for channel')
             .manual('Adds subscription for the channel the user is currently in. (subscription transfer-mode only)')
             .checkPermission(requirePrivileges(EDITBOT))
-            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+            .exec((client, args, reply, ev) => {
                 if (!engine.isSubscriptionMode()) {
                     reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
                     return;
@@ -714,7 +713,7 @@ registerPlugin({
             .help('Remove subscription for channel')
             .manual('Removes subscription for the channel the user is currently in. (subscription transfer-mode only)')
             .checkPermission(requirePrivileges(EDITBOT))
-            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+            .exec((client, args, reply, ev) => {
                 if (!engine.isSubscriptionMode()) {
                     reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
                     return;
@@ -728,7 +727,7 @@ registerPlugin({
             .help('Change Transmit-Mode')
             .manual('Changes Transmit-Mode; 0 = to channel, 1 = subscription mode')
             .checkPermission(requirePrivileges(EDITBOT))
-            .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+            .exec((client, args, reply, ev) => {
                 let mode = args.mode;
                 if (typeof mode === 'string') {
                     mode = mode.toLowerCase();
@@ -760,7 +759,7 @@ registerPlugin({
         .help('Enable / disable user registration via chat')
         .manual('Enables / disables user registration via chat. Value should be either `enable` or `disable`.')
         .checkPermission(requirePrivileges(EDITBOT))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             switch (args.value) {
             case "enable":
                 engine.enableRegistration();
@@ -782,7 +781,7 @@ registerPlugin({
         .help('Change command prefix')
         .manual('Changes the prefix for all core commands to <new prefix>, default is "!".')
         .checkPermission(requirePrivileges(EDITBOT))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             // print syntax if no prefix given
             if (!args.prefix) {
                 reply(USAGE_PREFIX + 'prefix <new prefix>');
@@ -797,7 +796,7 @@ registerPlugin({
         command.createCommand('ping')
         .help('pong')
         .manual('Responds with "PONG".')
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             reply(`PONG`);
             successReaction(ev);
         });
@@ -806,7 +805,7 @@ registerPlugin({
         .help('Show version')
         .manual('Shows the SinusBot version.')
         .checkPermission(requirePrivileges(EDITBOT))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             reply(`SinusBot v${engine.version()}\ncommand.js v${command.getVersion()}`);
             successReaction(ev);
         });
@@ -815,7 +814,7 @@ registerPlugin({
         .help('Reload scripts')
         .manual('Reloads scripts.\nPlease Note: New scripts require a complete sinusbot restart.')
         .checkPermission(requirePrivileges(EDITBOT))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(message: string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             reply('reloading...');
             let success = engine.reloadScripts();
             if (success) {
@@ -831,7 +830,7 @@ registerPlugin({
         .help('Move the SinusBot to your channel')
         .manual('Moves the SinusBot into your channel.')
         .checkPermission(requirePrivileges(STARTSTOP))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(msg:string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             var channel = client.getChannels()[0]
             if (!channel) {
                 return reply(ERROR_PREFIX+'I\'m unable to join your channel :(')
@@ -849,7 +848,7 @@ registerPlugin({
         .help('Disconnect the SinusBot')
         .manual('Disconnects the SinusBot from the current voice channel.')
         .checkPermission(requirePrivileges(STARTSTOP))
-        .exec((/** @type {Client} */client, /** @type {object} */args, /** @type {(msg:string)=>void} */reply, /** @implements {Message} */ev) => {
+        .exec((client, args, reply, ev) => {
             bot = backend.getBotClient() || bot
             if (!bot) {
                 return reply(ERROR_BOT_NULL)
@@ -1144,17 +1143,26 @@ registerPlugin({
     }
 
     /**
+     * @ignore
+     * @typedef MessageEvent
+     * @type {object}
+     * @property {Client} client
+     * @property {Channel} channel
+     * @property {string} text
+     * @property {number} mode
+     * @property {DiscordMessage} [message]
+     */
+
+    /**
      * Gives the user feedback if a command was successfull.
      *
-     * @param {Message} ev
+     * @param {MessageEvent} ev
      */
     function successReaction(ev) {
         if (!config.createSuccessReaction) {
             return;
         }
         if (engine.getBackend() == 'discord') {
-            /** @type {DiscordMessage} */
-            // @ts-ignore
             let message = ev.message;
             if (message) {
                 message.createReaction(REACTION_SUCCESS);
