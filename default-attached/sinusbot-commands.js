@@ -844,20 +844,21 @@ registerPlugin({
             successReaction(ev);
         });
 
-        command.createCommand('leave')
-        .help('Disconnect the SinusBot')
-        .manual('Disconnects the SinusBot from the current voice channel.')
-        .checkPermission(requirePrivileges(STARTSTOP))
-        .exec((client, args, reply, ev) => {
-            bot = backend.getBotClient() || bot
-            if (!bot) {
-                return reply(ERROR_BOT_NULL)
-            }
-
-            // @ts-ignore
-            bot.moveTo('')
-            successReaction(ev);
-        });
+        if (engine.getBackend() == 'discord') {
+            command.createCommand('leave')
+            .help('Disconnect the SinusBot')
+            .manual('Disconnects the SinusBot from the current voice channel.')
+            .checkPermission(requirePrivileges(STARTSTOP))
+            .exec((client, args, reply, ev) => {
+                bot = backend.getBotClient() || bot
+                if (!bot) {
+                    return reply(ERROR_BOT_NULL)
+                }
+                
+                bot.moveTo('')
+                successReaction(ev);
+            });
+        }
     });
 
     /********** !playing stuff for discord **********/
