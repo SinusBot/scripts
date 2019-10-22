@@ -267,10 +267,12 @@ registerPlugin({
             .manual('Show what\'s currantly playing')
             .exec((client, args, reply, ev) => {
                 if (!audio.isPlaying()) {
+                    successReaction(ev);
                     return reply('There is nothing playing at the moment.');
                 }
 
                 reply(formatTrack(media.getCurrentTrack()));
+                successReaction(ev);
             });
         }
 
@@ -1072,15 +1074,15 @@ registerPlugin({
         };
     }
 
-    /**
-     * Returns a formatted string from a track.
-     *
-     * @param {Track} track
-     * @returns {string} formatted string
-     */
-    function formatTrackWithID(track) {
-        return `${format.code(track.id())} ${formatTrack(track)}`;
-    }
+    // /**
+    //  * Returns a formatted string from a track.
+    //  *
+    //  * @param {Track} track
+    //  * @returns {string} formatted string
+    //  */
+    // function formatTrackWithID(track) {
+    //     return `${format.code(track.id())} ${formatTrack(track)}`;
+    // }
 
     /**
      * Returns a formatted string from a track.
