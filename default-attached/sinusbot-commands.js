@@ -505,7 +505,7 @@ registerPlugin({
                 return;
             }
 
-            if (!media.ytStream(stripURL(args.url))) {
+            if (!media.playURL(stripURL(args.url))) {
                 reply(ERROR_PREFIX + 'Invalid URL.');
                 return;
             }
