@@ -822,7 +822,7 @@ registerPlugin({
         .manual('Shows the SinusBot version.')
         .checkPermission(requirePrivileges(EDITBOT))
         .exec((client, args, reply, ev) => {
-            reply(`SinusBot v${engine.version()}\ncommand.js v${command.getVersion()}`);
+            reply(`SinusBot v${engine.version()}\nsinusbot-commands.js v${meta.version}\ncommand.js v${command.getVersion()}`);
             successReaction(ev);
         });
 
