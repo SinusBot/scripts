@@ -207,6 +207,19 @@ registerPlugin({
             successReaction(ev);
         });
 
+        command.createCommand('whoami')
+        .help('Show user identities')
+        .manual('Shows user identities matching your ID/groups.')
+        .exec((client, args, reply, ev) => {
+            let users = getUsersByClient(client);
+            if (users && users.length != 0) {
+                reply(`You match the following users: ${users.map(user => user.name()).join(", ")}.`);
+            } else {
+                reply("You don't match any users.");
+            }
+            successReaction(ev);
+        });
+
         if (engine.getBackend() == 'discord') {
             command.createCommand('playing')
             .help('Show what\'s currantly playing')
@@ -827,7 +840,6 @@ registerPlugin({
                 reply('Unable to reload scripts. Did you allow it in your `config.ini`?');
             }
         });
-
         
         command.createCommand('join')
         .help('Move the SinusBot to your channel')
