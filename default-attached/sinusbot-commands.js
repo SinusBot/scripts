@@ -32,7 +32,8 @@ registerPlugin({
     author: 'Jonas Bögle (@irgendwr)',
     engine: '>= 1.0.0',
     backends: ['ts3', 'discord'],
-    requiredModules: ['discord-dangerous'],
+    // the next line is not required since beta.7
+    //requiredModules: ['discord-dangerous'],
     autorun: true,
     vars: [
         {
