@@ -222,8 +222,8 @@ registerPlugin({
 
         if (engine.getBackend() == 'discord') {
             command.createCommand('playing')
-            .help('Show what\'s currantly playing')
-            .manual('Show what\'s currantly playing')
+            .help('Show what\'s currently playing')
+            .manual('Show what\'s currently playing')
             .exec((client, args, reply, ev) => {
                 if (!audio.isPlaying()) {
                     return reply('There is nothing playing at the moment.');
@@ -277,8 +277,8 @@ registerPlugin({
             });
         } else {
             command.createCommand('playing')
-            .help('Show what\'s currantly playing')
-            .manual('Show what\'s currantly playing')
+            .help('Show what\'s currently playing')
+            .manual('Show what\'s currently playing')
             .exec((client, args, reply, ev) => {
                 if (!audio.isPlaying()) {
                     successReaction(ev);
