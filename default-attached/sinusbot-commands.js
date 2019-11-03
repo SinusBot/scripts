@@ -174,6 +174,7 @@ registerPlugin({
                 reply(ERROR_PREFIX + 'Unable to assign uid to user.');
                 return;
             }
+            reply(SUCCESS_PREFIX + 'Registered a user with the given name.\nThis account has no privileges by default but can be edited by the bot administrators.');
             successReaction(ev, reply);
         });
         
