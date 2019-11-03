@@ -169,7 +169,7 @@ registerPlugin({
                 return;
             }
 
-            if (!newUser.setTSUid(client.uid())) {
+            if (!newUser.setUid(client.uid())) {
                 newUser.delete()
                 reply(ERROR_PREFIX + 'Unable to assign uid to user.');
                 return;
@@ -1061,9 +1061,9 @@ registerPlugin({
     function getUsersByClient(client) {
         return engine.getUsers().filter(user =>
             // does the UID match?
-            client.uid() == user.tsUid() ||
+            client.uid() == user.uid() ||
             // does a group ID match?
-            client.getServerGroups().map(group => group.id()).includes(user.tsGroupId())
+            client.getServerGroups().map(group => group.id()).includes(user.groupId())
         );
     }
 
