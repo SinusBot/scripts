@@ -171,9 +171,10 @@ registerPlugin({
 
             if (!newUser.setTSUid(client.uid())) {
                 newUser.delete()
-                return reply(ERROR_PREFIX + 'Unable to assign uid to user.');
+                reply(ERROR_PREFIX + 'Unable to assign uid to user.');
+                return;
             }
-
+            successReaction(ev, reply);
         });
         
         command.createCommand('password')
@@ -815,6 +816,7 @@ registerPlugin({
         .help('responds with "PONG"')
         .exec((client, args, reply, ev) => {
             reply(`PONG`);
+            successReaction(ev, reply);
         });
 
         command.createCommand('version')
