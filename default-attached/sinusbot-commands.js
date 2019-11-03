@@ -201,7 +201,10 @@ registerPlugin({
             }
 
             // set password
-            user.setPassword(args.value);
+            if (!user.setPassword(args.value)) {
+                reply(ERROR_PREFIX + 'Unable to set password.');
+                return;
+            }
             reply(SUCCESS_PREFIX + 'Changed your password.');
             successReaction(ev, reply);
         });
