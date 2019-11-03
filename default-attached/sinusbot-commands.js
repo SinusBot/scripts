@@ -694,6 +694,7 @@ registerPlugin({
             command.createCommand('sub')
             .help('Subscribe to bot')
             .manual('Subscribes to the bot. (subscription transfer-mode only)')
+            .checkPermission(() => engine.isSubscriptionMode())
             .exec((client, args, reply, ev) => {
                 if (!engine.isSubscriptionMode()) {
                     reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
@@ -706,6 +707,7 @@ registerPlugin({
             command.createCommand('unsub')
             .help('Unsubscribe from bot')
             .manual('Unsubscribes from the bot. (subscription transfer-mode only)')
+            .checkPermission(() => engine.isSubscriptionMode())
             .exec((client, args, reply, ev) => {
                 if (!engine.isSubscriptionMode()) {
                     reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
@@ -718,7 +720,7 @@ registerPlugin({
             command.createCommand('subchan')
             .help('Add subscription for channel')
             .manual('Adds subscription for the channel the user is currently in. (subscription transfer-mode only)')
-            .checkPermission(requirePrivileges(EDITBOT))
+            .checkPermission(client => requirePrivileges(EDITBOT)(client) && engine.isSubscriptionMode())
             .exec((client, args, reply, ev) => {
                 if (!engine.isSubscriptionMode()) {
                     reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
@@ -731,7 +733,7 @@ registerPlugin({
             command.createCommand('unsubchan')
             .help('Remove subscription for channel')
             .manual('Removes subscription for the channel the user is currently in. (subscription transfer-mode only)')
-            .checkPermission(requirePrivileges(EDITBOT))
+            .checkPermission(client => requirePrivileges(EDITBOT)(client) && engine.isSubscriptionMode())
             .exec((client, args, reply, ev) => {
                 if (!engine.isSubscriptionMode()) {
                     reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
