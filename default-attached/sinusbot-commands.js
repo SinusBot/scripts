@@ -1077,7 +1077,7 @@ registerPlugin({
             return getUsersByClient(client).some(user => {
                 // check if at least one privilege is found
                 return privileges.some(priv => {
-                    return (user.privileges() & priv) === priv;
+                    return ((user.privileges()|user.instancePrivileges()) & priv) === priv;
                 });
             });
         };
