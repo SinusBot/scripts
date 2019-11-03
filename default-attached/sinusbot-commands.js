@@ -37,6 +37,12 @@ registerPlugin({
     autorun: true,
     vars: [
         {
+            name: 'createSuccessReaction',
+            title: 'Add a reaction to each command if it was successfull.',
+            type: 'checkbox',
+            default: false
+        },
+        {
             name: 'discord',
             title: 'Show discord settings',
             type: 'checkbox',
@@ -62,14 +68,7 @@ registerPlugin({
             type: 'checkbox',
             default: true,
             conditions: [{ field: 'discord', value: true }],
-        },
-        {
-            name: 'createSuccessReaction',
-            title: 'Add a reaction to each command if it was successfull.',
-            type: 'checkbox',
-            default: false,
-            conditions: [{ field: 'discord', value: true }],
-        },
+        }
     ]
 }, (_, config, meta) => {
     const event = require('event')
@@ -169,10 +168,12 @@ registerPlugin({
                 reply(ERROR_PREFIX + 'Unable to create user, try another username.');
                 return;
             }
-            // set uid
-            newUser.setTSUid(client.uid());
 
-            successReaction(ev);
+            if (!newUser.setTSUid(client.uid())) {
+                newUser.delete()
+                return reply(ERROR_PREFIX + 'Unable to assign uid to user.');
+            }
+
         });
         
         command.createCommand('password')
@@ -180,9 +181,7 @@ registerPlugin({
         .addArgument(command.createArgument('rest').setName('value'))
         .help('Change your password')
         .manual('Changes your password to <value>.')
-        .checkPermission(client => {
-            return getUserByUid(client.uid()) != null;
-        })
+        .checkPermission(client => getUserByUid(client.uid()))
         .exec((client, args, reply, ev) => {
             // print syntax if no value given
             if (!args.value) {
@@ -204,7 +203,7 @@ registerPlugin({
             // set password
             user.setPassword(args.value);
             reply(SUCCESS_PREFIX + 'Changed your password.');
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('whoami')
@@ -217,7 +216,7 @@ registerPlugin({
             } else {
                 reply("You don't match any users.");
             }
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         if (engine.getBackend() == 'discord') {
@@ -273,7 +272,7 @@ registerPlugin({
                     // store lastEmbeds
                     store.set('lastEmbeds', lastEmbeds);
                 });
-                successReaction(ev);
+                successReaction(ev, reply);
             });
         } else {
             command.createCommand('playing')
@@ -281,12 +280,12 @@ registerPlugin({
             .manual('Show what\'s currently playing')
             .exec((client, args, reply, ev) => {
                 if (!audio.isPlaying()) {
-                    successReaction(ev);
+                    successReaction(ev, reply);
                     return reply('There is nothing playing at the moment.');
                 }
 
                 reply(formatTrack(media.getCurrentTrack()));
-                successReaction(ev);
+                successReaction(ev, reply);
             });
         }
 
@@ -296,7 +295,7 @@ registerPlugin({
         .checkPermission(requirePrivileges(PLAYBACK))
         .exec((client, args, reply, ev) => {
             media.playNext();
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('prev')
@@ -306,7 +305,7 @@ registerPlugin({
         .checkPermission(requirePrivileges(PLAYBACK))
         .exec((client, args, reply, ev) => {
             media.playPrevious();
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('search')
@@ -325,13 +324,13 @@ registerPlugin({
             const tracks = media.search(args.searchstring);
             if (tracks.length == 0) {
                 reply('Sorry, nothing found.');
-                successReaction(ev);
+                successReaction(ev, reply);
                 return;
             }
 
             const response = tracks.map(formatTrack).join("\n")
             reply(response);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('play')
@@ -360,7 +359,7 @@ registerPlugin({
 
             track.play();
             reply(`Playing ${formatTrack(track)}`);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('playlist')
@@ -382,13 +381,13 @@ registerPlugin({
 
             if (!match) {
                 reply('Sorry, no matching playlist found.');
-                successReaction(ev);
+                successReaction(ev, reply);
                 return;
             }
             
             media.playlistPlayByID(match, 0);
 
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('queue')
@@ -418,7 +417,7 @@ registerPlugin({
 
             track.enqueue();
             reply(`Added ${formatTrack(track)} to the queue`);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('queuenext')
@@ -447,7 +446,7 @@ registerPlugin({
 
             track.enqueue();
             reply(`Added ${formatTrack(track)} to the queue`);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('stop')
@@ -456,7 +455,7 @@ registerPlugin({
         .checkPermission(requirePrivileges(PLAYBACK))
         .exec((client, args, reply, ev) => {
             media.stop();
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('!stop')
@@ -466,7 +465,7 @@ registerPlugin({
         .exec((client, args, reply, ev) => {
             media.stop();
             media.clearIdleTrack();
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('volume')
@@ -504,7 +503,7 @@ registerPlugin({
             }
 
             audio.setVolume(volume);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('stream')
@@ -523,7 +522,7 @@ registerPlugin({
                 reply(ERROR_PREFIX + 'Invalid URL.');
                 return;
             }
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('say')
@@ -539,7 +538,7 @@ registerPlugin({
             }
 
             audio.say(args.text);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('sayex')
@@ -556,7 +555,7 @@ registerPlugin({
             }
 
             audio.say(args.text, args.locale);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('ttsurl')
@@ -572,7 +571,7 @@ registerPlugin({
             }
 
             audio.setTTSURL(stripURL(args.url));
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('ttslocale')
@@ -588,7 +587,7 @@ registerPlugin({
             }
 
             audio.setTTSDefaultLocale(args.locale);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('yt')
@@ -607,7 +606,7 @@ registerPlugin({
                 reply(ERROR_PREFIX + 'Invalid URL.');
                 return;
             }
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('ytdl')
@@ -626,7 +625,7 @@ registerPlugin({
                 reply(ERROR_PREFIX + 'Invalid URL.');
                 return;
             }
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('qyt')
@@ -645,7 +644,7 @@ registerPlugin({
                 reply(ERROR_PREFIX + 'Invalid URL.');
                 return;
             }
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('qytdl')
@@ -664,7 +663,7 @@ registerPlugin({
                 reply(ERROR_PREFIX + 'Invalid URL.');
                 return;
             }
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('shuffle')
@@ -674,7 +673,7 @@ registerPlugin({
         .exec((client, args, reply, ev) => {
             audio.setShuffle(!audio.isShuffle());
             reply(SUCCESS_PREFIX + `Shuffle is now ${audio.isShuffle() ? 'en' : 'dis'}abled.`);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('repeat')
@@ -684,7 +683,7 @@ registerPlugin({
         .exec((client, args, reply, ev) => {
             audio.setRepeat(!audio.isRepeat());
             reply(SUCCESS_PREFIX + `Repeat is now ${audio.isShuffle() ? 'en' : 'dis'}abled.`);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         if (engine.getBackend() == 'ts3') {
@@ -697,7 +696,7 @@ registerPlugin({
                     return;
                 }
                 client.subscribe(true);
-                successReaction(ev);
+                successReaction(ev, reply);
             });
 
             command.createCommand('unsub')
@@ -709,7 +708,7 @@ registerPlugin({
                     return;
                 }
                 client.subscribe(false);
-                successReaction(ev);
+                successReaction(ev, reply);
             });
 
             command.createCommand('subchan')
@@ -722,7 +721,7 @@ registerPlugin({
                     return;
                 }
                 client.getChannels()[0].subscribe(true);
-                successReaction(ev);
+                successReaction(ev, reply);
             });
 
             command.createCommand('unsubchan')
@@ -735,7 +734,7 @@ registerPlugin({
                     return;
                 }
                 client.getChannels()[0].subscribe(false);
-                successReaction(ev);
+                successReaction(ev, reply);
             });
 
             command.createCommand('mode')
@@ -755,14 +754,14 @@ registerPlugin({
                 case "channel":
                     engine.setSubscriptionMode(false);
                     reply(SUCCESS_PREFIX + 'Transmit-Mode is now set to Channel (default).');
-                    successReaction(ev);
+                    successReaction(ev, reply);
                     break;
                 case "1":
                 case "sub":
                 case "subscription":
                     engine.setSubscriptionMode(true);
                     reply(SUCCESS_PREFIX + 'Transmit-Mode is now set to Subscription.');
-                    successReaction(ev);
+                    successReaction(ev, reply);
                     break;
                 default:
                     reply(`Transmit-Mode is currently set to ${engine.isSubscriptionMode() ? 'Subscription' : 'Channel (default)'}.\n` + USAGE_PREFIX + 'mode <0|chan(nel)|1|sub(scription)>');
@@ -780,12 +779,12 @@ registerPlugin({
             case "enable":
                 engine.enableRegistration();
                 reply(SUCCESS_PREFIX + 'Registration is now enabled.');
-                successReaction(ev);
+                successReaction(ev, reply);
                 break;
             case "disable":
                 engine.disableRegistration();
                 reply(SUCCESS_PREFIX + 'Registration is now disabled.');
-                successReaction(ev);
+                successReaction(ev, reply);
                 break;
             default:
                 reply(`Registartion is currently ${engine.registrationEnabled() ? 'en' : 'dis'}abled.\n` + USAGE_PREFIX + 'registration <enable|disable>');
@@ -806,15 +805,13 @@ registerPlugin({
 
             engine.setCommandPrefix(args.prefix);
             reply(SUCCESS_PREFIX + 'New prefix: ' + args.prefix);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('ping')
-        .help('pong')
-        .manual('Responds with "PONG".')
+        .help('responds with "PONG"')
         .exec((client, args, reply, ev) => {
             reply(`PONG`);
-            successReaction(ev);
         });
 
         command.createCommand('version')
@@ -823,7 +820,7 @@ registerPlugin({
         .checkPermission(requirePrivileges(EDITBOT))
         .exec((client, args, reply, ev) => {
             reply(`SinusBot v${engine.version()}\nsinusbot-commands.js v${meta.version}\ncommand.js v${command.getVersion()}`);
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         command.createCommand('reload')
@@ -835,7 +832,7 @@ registerPlugin({
             let success = engine.reloadScripts();
             if (success) {
                 reply(SUCCESS_PREFIX + `Scripts reloaded.\nNew scripts require a complete sinusbot restart.`);
-                successReaction(ev);
+                successReaction(ev, reply);
             } else {
                 reply('Unable to reload scripts. Did you allow it in your `config.ini`?');
             }
@@ -856,7 +853,7 @@ registerPlugin({
                 return reply(ERROR_BOT_NULL)
             }
             bot.moveTo(channel)
-            successReaction(ev);
+            successReaction(ev, reply);
         });
 
         if (engine.getBackend() == 'discord') {
@@ -871,7 +868,7 @@ registerPlugin({
                 }
                 
                 bot.moveTo('')
-                successReaction(ev);
+                successReaction(ev, reply);
             });
         }
     });
@@ -1047,13 +1044,7 @@ registerPlugin({
      * @returns {User} first user with given uid
      */
     function getUserByUid(uid) {
-        for (let user of engine.getUsers()) {
-            if (user.tsUid() == uid) {
-                return user;
-            }
-        }
-
-        return null;
+        return engine.getUsers().find(user => user.tsUid() === uid)
     }
 
     /**
@@ -1173,16 +1164,18 @@ registerPlugin({
      * Gives the user feedback if a command was successfull.
      *
      * @param {MessageEvent} ev
+     * @param {(msg: string) => void} reply
      */
-    function successReaction(ev) {
+    function successReaction(ev, reply) {
         if (!config.createSuccessReaction) {
             return;
         }
-        if (engine.getBackend() == 'discord') {
-            let message = ev.message;
-            if (message) {
-                message.createReaction(REACTION_SUCCESS);
-            }
+        switch (engine.getBackend()) {
+            case "discord":
+                if (ev.message) ev.message.createReaction(REACTION_SUCCESS)
+                return
+            case "ts3":
+                return reply(`${REACTION_SUCCESS} done!`)
         }
     }
     
