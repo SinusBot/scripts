@@ -26,6 +26,7 @@
  * 
  * Thanks to the following GitHub sponsors for supporting my work:
  * - Jay Vasallo
+ * - Michael Friese
  * 
  * github.com/sponsors/irgendwr
  */
