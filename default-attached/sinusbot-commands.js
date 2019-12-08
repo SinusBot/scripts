@@ -692,7 +692,7 @@ registerPlugin({
         .checkPermission(requirePrivileges(PLAYBACK))
         .exec((client, args, reply, ev) => {
             audio.setRepeat(!audio.isRepeat());
-            reply(SUCCESS_PREFIX + `Repeat is now ${audio.isShuffle() ? 'en' : 'dis'}abled.`);
+            reply(SUCCESS_PREFIX + `Repeat is now ${audio.isRepeat() ? 'en' : 'dis'}abled.`);
             successReaction(ev, reply);
         });
 
