@@ -1071,7 +1071,9 @@ registerPlugin({
             // does the UID match?
             client.uid() == user.uid() ||
             // does a group ID match?
-            client.getServerGroups().map(group => group.id()).includes(user.groupId())
+            client.getServerGroups().map(group => group.id()).includes(user.groupId()) ||
+            // group ID '-1' matches everyone
+            user.groupId() == '-1'
         );
     }
 
