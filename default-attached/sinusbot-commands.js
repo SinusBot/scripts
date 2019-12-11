@@ -1116,18 +1116,28 @@ registerPlugin({
     }
 
     /**
-     * Removes TeamSpeaks URL bb-code from a given string.
+     * Removes TeamSpeaks URL bb-code or Discords < > from a given string.
      *
      * @param {string} str
-     * @returns {string} str without [URL][/URL]
+     * @returns {string} str without [URL] [/URL] and < >
      */
     function stripURL(str) {
+        // don't handle non-strings, return as provided
         if (typeof str !== 'string') return str;
 
-        const match = str.match(/\[URL\](.+)\[\/URL\]/);
+        // remove surrounding [URL] [/URL] tags
+        let match = str.match(/\[URL\](.+)\[\/URL\]/i);
         if (match && match.length >= 2) {
             return match[1];
         }
+
+        // remove surrounding < >
+        match = str.match(/<(.+)>/);
+        if (match && match.length >= 2) {
+            return match[1];
+        }
+
+        // if nothing matches just return str
         return str;
     }
 
@@ -1136,7 +1146,7 @@ registerPlugin({
      * @param {number} milliseconds
      */
     function timestamp(milliseconds) {
-        const SECOND = 1000;
+        const SECOND = 1000; //milliseconds
         const MINUTE = 60 * SECOND;
         const HOUR = 60 * MINUTE;
 
