@@ -82,7 +82,6 @@ registerPlugin({
     const format = require('format')
     const audio = require('audio')
     const media = require('media')
-    const store = require('store')
 
     engine.log(`Loaded ${meta.name} v${meta.version} by ${meta.author}.`)
 
@@ -122,9 +121,8 @@ registerPlugin({
     const ERROR_BOT_NULL = ERROR_PREFIX+'Unable to change channel.\nTry to set a *Default Channel* in the webinterface and click save.'
     let bot = backend.getBotClient();
 
-    // restore lastEmbeds
     /** @type {object[]} */
-    let lastEmbeds = store.get('lastEmbeds') || [];
+    let lastEmbeds = [];
 
     if (config.discord && engine.getBackend() != 'discord') {
         // hide discord-only settings if backend is not discord
@@ -278,9 +276,6 @@ registerPlugin({
                     .then(() => createReaction(channel_id, id, REACTION_PLAYPAUSE))
                     .then(() => wait(150))
                     .then(() => createReaction(channel_id, id, REACTION_NEXT));
-
-                    // store lastEmbeds
-                    store.set('lastEmbeds', lastEmbeds);
                 });
                 successReaction(ev, reply);
             });
@@ -888,88 +883,101 @@ registerPlugin({
 
     /********** !playing stuff for discord **********/
     if (engine.getBackend() == 'discord') {
-        event.on('unload', () => {
-            // save lastEmbeds
-            store.set('lastEmbeds', lastEmbeds);
-        });
-
         event.on('discord:MESSAGE_REACTION_ADD', ev => {
-            const emoji = ev.emoji.id ? `${ev.emoji.name}:${ev.emoji.id}` : ev.emoji.name;
+            let ename = ev.emoji.name;
+            // remove 0xefb88f aka. "VARIATION SELECTOR-16" (no idea why discord puts that at the end)
+            if (ename.endsWith('\ufe0f')) {
+                ename = ename.slice(0, -1);
+            }
+            const emoji = ev.emoji.id ? `${ename}:${ev.emoji.id}` : ename;
 
             // ignore reactions that are not controls
             if (![REACTION_PREV, REACTION_PLAYPAUSE, REACTION_NEXT].includes(emoji)) return;
+
             // ignore reactions from the bot itself
             if (backend.getBotClientID().endsWith(ev.user_id)) return;
 
             // get user via id
-            const client = backend.getClientByID((ev.guild_id ? ev.guild_id+'/' : '')+ev.user_id);
-            // check if user was found
-            if (client) {
-                // ignore reactions from the bot itself
-                if (client.isSelf()) return;
+            const client = backend.getClientByID(ev.guild_id ? `${ev.guild_id}/${ev.user_id}` : ev.user_id);
 
+            // ignore if no matching user found or reaction from the bot itself
+            if (!client || client.isSelf()) return;
+
+            let callback = () => {
                 // delete the rection
                 deleteUserReaction(ev.channel_id, ev.message_id, ev.user_id, emoji);
 
                 // check if user has the 'playback' permission
-                if (requirePrivileges(PLAYBACK)(client)) {
-                    const track = media.getCurrentTrack();
-
-                    switch (emoji) {
-                    case REACTION_PREV:
-                        // ignore if nothing is playing
-                        if (!audio.isPlaying()) return;
-
-                        if (media.getQueue().length !== 0) {
-                            // start from beginning if we're playing queue
-                            audio.seek(0);
-                        } else {
-                            // try prev (doesn't work for queue or folder)
-                            media.playPrevious();
-        
-                            // fallback: start from beginning if there is no previous track
-                            if (!audio.isPlaying()) {
-                                if (track) track.play();
-                            }
-                        }
-                        break;
-                    case REACTION_PLAYPAUSE:
-                        if (audio.isPlaying()) {
-                            media.stop();
-                        } else {
-                            if (!track) return;
-                            const pos = audio.getTrackPosition();
-
-                            if (pos && pos < (track.duration() - 1000 /* milliseconds */)) {
-                                // continue playing at last pos
-                                audio.setMute(true);
-                                track.play();
-                                audio.seek(pos);
-                                audio.setMute(false);
-                            } else {
-                                // or start from beginning if it already ended
-                                audio.seek(0);
-                                track.play();
-                            }
-                        }
-                        break;
-                    case REACTION_NEXT:
-                        if (!audio.isPlaying()) {
-                            // is something in queue? try to resume
-                            if (media.getQueue().length !== 0) {
-                                media.playQueueNext();
-                            }
-                            // ignore if nothing is playing
-                            return;
-                        }
-                            
-                        media.playNext();
-                    }
-                } else {
+                if (!requirePrivileges(PLAYBACK)(client)) {
                     engine.log(`${client.nick()} is missing playback permissions for reaction controls`);
                     client.chat(ERROR_PREFIX + 'You need the playback permission to use reaction controls');
+                    return;
                 }
+
+                const track = media.getCurrentTrack();
+
+                switch (emoji) {
+                case REACTION_PREV:
+                    // ignore if nothing is playing
+                    if (!audio.isPlaying()) return;
+
+                    if (media.getQueue().length !== 0) {
+                        // start from beginning if we're playing queue
+                        audio.seek(0);
+                    } else {
+                        // try prev (doesn't work for queue or folder)
+                        media.playPrevious();
+
+                        // fallback: start from beginning if there is no previous track
+                        if (!audio.isPlaying()) {
+                            if (track) track.play();
+                        }
+                    }
+                    break;
+                case REACTION_PLAYPAUSE:
+                    if (audio.isPlaying()) {
+                        media.stop();
+                    } else {
+                        if (!track) return;
+                        const pos = audio.getTrackPosition();
+
+                        if (pos && pos < (track.duration() - 1000 /* milliseconds */)) {
+                            // continue playing at last pos
+                            audio.setMute(true);
+                            track.play();
+                            audio.seek(pos);
+                            audio.setMute(false);
+                        } else {
+                            // or start from beginning if it already ended
+                            track.play();
+                        }
+                    }
+                    break;
+                case REACTION_NEXT:
+                    if (audio.isPlaying()) {
+                        media.playNext();
+                    } else {
+                        // is something in queue?
+                        if (media.getQueue().length !== 0) {
+                            // resume queue
+                            media.playQueueNext();
+                        }
+                    }
+                }
+            };
+
+            // was reaction added to previous response?
+            if (lastEmbeds.some(embed => embed.messageId == ev.message_id)) {
+                callback();
+                return;
             }
+
+            getMessage(ev.channel_id, ev.message_id).then(msg => {
+                // was reaction added to previous response of the bot?
+                if (backend.getBotClientID().endsWith(msg.author.id)) {
+                    callback();
+                }
+            })
         });
 
         /**
@@ -1237,6 +1245,16 @@ registerPlugin({
     }
 
     /**
+     * Gets a message.
+     * @param {string} channelID Channel ID
+     * @param {string} messageID Message ID
+     * @return {Promise<object>}
+     */
+    function getMessage(channelID, messageID) {
+        return discord('GET', `/channels/${channelID}/messages/${messageID}`, null, true);
+    }
+
+    /**
      * Edits a message.
      * @param {string} channelID Channel ID
      * @param {string} messageID Message ID
@@ -1279,7 +1297,7 @@ registerPlugin({
      * @param {boolean} [repsonse] `true` if you're expecting a json response, `false` otherwise
      * @return {Promise<object>}
      */
-    function discord(method, path, data, repsonse=true) {
+    function discord(method, path, data=null, repsonse=true) {
         return new Promise((resolve, reject) => {
             backend.extended().rawCommand(method, path, data, (err, data) => {
                 if (err) return reject(err);
@@ -1288,6 +1306,8 @@ registerPlugin({
                     try {
                         res = JSON.parse(data);
                     } catch (err) {
+                        engine.log(`${method} ${path}`);
+                        engine.log('Invalid JSON: ' + data);
                         return reject(err);
                     }
                     
