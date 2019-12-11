@@ -940,7 +940,7 @@ registerPlugin({
                             if (!track) return;
                             const pos = audio.getTrackPosition();
 
-                            if (pos && pos < track.duration()) {
+                            if (pos && pos < (track.duration() - 1000 /* milliseconds */)) {
                                 // continue playing at last pos
                                 audio.setMute(true);
                                 track.play();
