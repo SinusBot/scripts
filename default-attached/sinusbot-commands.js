@@ -894,7 +894,7 @@ registerPlugin({
         });
 
         event.on('discord:MESSAGE_REACTION_ADD', ev => {
-            const emoji = (ev.emoji.id || '') + ev.emoji.name;
+            const emoji = ev.emoji.id ? `${ev.emoji.name}:${ev.emoji.id}` : ev.emoji.name;
 
             // ignore reactions that are not controls
             if (![REACTION_PREV, REACTION_PLAYPAUSE, REACTION_NEXT].includes(emoji)) return;
