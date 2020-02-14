@@ -1,6 +1,6 @@
 registerPlugin({
     name: 'AloneMode',
-    version: '3.0',
+    version: '3.1',
     backends: ['ts3', 'discord'],
     description: 'This script will save CPU and bandwidth by stopping or muting the bot when nobody is listening anyways.',
     author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
@@ -29,7 +29,8 @@ registerPlugin({
     audio.setMute(false)
 
     event.on('clientMove', () => {
-        let clients = backend.getCurrentChannel().getClientCount()
+        let currentChannel = backend.getCurrentChannel()
+        let clients = currentChannel ? currentChannel.getClientCount() : 0
 
         if (clients > 1 && isMuted) {
             isMuted = false
