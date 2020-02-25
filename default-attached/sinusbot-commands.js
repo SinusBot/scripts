@@ -4,7 +4,7 @@
  * 
  * MIT License
  * 
- * Copyright (c) 2019 Jonas Bögle, Michael Friese
+ * Copyright (c) 2019-2020 Jonas Bögle, Michael Friese
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,10 +25,10 @@
  * SOFTWARE.
  * 
  * Thanks to the following GitHub sponsors for supporting my work:
- * - Jay Vasallo
  * - Michael Friese
+ * - Jay Vasallo
  * 
- * github.com/sponsors/irgendwr
+ * https://github.com/sponsors/irgendwr
  */
 registerPlugin({
     name: 'SinusBot Commands',
@@ -42,37 +42,64 @@ registerPlugin({
     autorun: true,
     vars: [
         {
+            /*
+             * Note: Normally you should **not** add something like this,
+             * because you can already disable scripts by unchecking them.
+             * However in this case it makes sense as `autorun: true`
+             * no longer allows users to disable it otherwise.
+             */
+            name: 'disable',
+            title: 'Disable the default SinusBot commands.',
+            type: 'checkbox',
+            default: false
+        },
+        {
             name: 'createSuccessReaction',
             title: 'Add a reaction to each command if it was successfull.',
             type: 'checkbox',
-            default: false
+            default: false,
+            conditions: [
+                { field: 'disable', value: false }
+            ],
         },
         {
             name: 'discord',
             title: 'Show discord settings',
             type: 'checkbox',
             default: true,
+            conditions: [
+                { field: 'disable', value: false }
+            ],
         },
         {
             name: 'url',
             title: 'URL to Webinterface (optional, for album covers in discord)',
             type: 'string',
             placeholder: 'i.e. https://sinusbot.example.com',
-            conditions: [{ field: 'discord', value: true }],
+            conditions: [
+                { field: 'discord', value: true },
+                { field: 'disable', value: false }
+            ],
         },
         {
             name: 'songInStatus',
             title: 'Show playing song in status.',
             type: 'checkbox',
             default: true,
-            conditions: [{ field: 'discord', value: true }],
+            conditions: [
+                { field: 'discord', value: true },
+                { field: 'disable', value: false }
+            ],
         },
         {
             name: 'deleteOldMessages',
             title: 'Delete previous responses if !playing command is used again',
             type: 'checkbox',
             default: true,
-            conditions: [{ field: 'discord', value: true }],
+            conditions: [
+                { field: 'discord', value: true },
+                { field: 'disable', value: false }
+            ],
         }
     ]
 }, (_, config, meta) => {
@@ -84,6 +111,11 @@ registerPlugin({
     const media = require('media')
 
     engine.log(`Loaded ${meta.name} v${meta.version} by ${meta.author}.`)
+
+    if (config.disable) {
+        engine.log('SinusBot commands are DISABLED.')
+        return;
+    }
 
     /********* privileges *********/
     /* eslint-disable no-unused-vars */
@@ -127,6 +159,10 @@ registerPlugin({
     if (config.discord && engine.getBackend() != 'discord') {
         // hide discord-only settings if backend is not discord
         config.discord = false;
+        engine.saveConfig(config);
+    } else if (!config.discord && engine.getBackend() == 'discord') {
+        // show discord-only settings if backend is discord
+        config.discord = true;
         engine.saveConfig(config);
     }
 
