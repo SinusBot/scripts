@@ -111,6 +111,7 @@ registerPlugin({
     const media = require('media')
 
     engine.log(`Loaded ${meta.name} v${meta.version} by ${meta.author}.`)
+    engine.log(`SinusBot v${engine.version()}`)
 
     if (config.disable) {
         engine.log('SinusBot commands are DISABLED.')
