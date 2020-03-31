@@ -45,7 +45,7 @@ registerPlugin({
                     engine.log(`Seeking to ${lastPosition} of track '${lastTrack.title()}'`)
                 }
             }
-        } else if (clients <= 1 && audio.isPlaying()) {
+        } else if (clients <= 1 && audio.isPlaying() && isMuted == false) {
             isMuted = true
             engine.log('Starting AloneMode...')
             
