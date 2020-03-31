@@ -48,7 +48,7 @@ registerPlugin({
         } else if (clients <= 1 && audio.isPlaying() && isMuted == false) {
             isMuted = true
             engine.log('Starting AloneMode...')
-            
+
             if (mode == MUTE_ONLY) {
                 audio.setMute(true)
             } else {
