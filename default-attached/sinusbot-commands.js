@@ -145,6 +145,8 @@ registerPlugin({
     const REACTION_NEXT = '⏭';
     const REACTION_SUCCESS = '✅';
 
+    const YT_DOMAIN = /^https?:\/\/(?:www\.)?youtube\.com\//i;
+
     // for join/leave
     const ERROR_BOT_NULL = ERROR_PREFIX+'Unable to change channel.\nTry to set a *Default Channel* in the webinterface and click save.'
 
@@ -558,8 +560,19 @@ registerPlugin({
                     return;
                 }
 
-                if (!media.playURL(stripURL(args.url))) {
-                    reply(ERROR_PREFIX + 'Invalid URL.');
+                const url = stripURL(args.url);
+
+                if (url.match(YT_DOMAIN)) {
+                    if (!media.ytStream(url)) {
+                        reply(ERROR_PREFIX + 'Unable to stream this YouTube URL.');
+                        return;
+                    }
+                    successReaction(ev, reply);
+                    return;
+                }
+
+                if (!media.playURL(url)) {
+                    reply(ERROR_PREFIX + 'Unable to stream this URL.');
                     return;
                 }
                 successReaction(ev, reply);
@@ -642,8 +655,26 @@ registerPlugin({
                     return;
                 }
 
-                if (!media.yt(stripURL(args.url))) {
-                    reply(ERROR_PREFIX + 'Invalid URL.');
+                media.yt(stripURL(args.url));
+                // TODO: add success/error callback
+                successReaction(ev, reply);
+            });
+
+            command.createCommand('ytstream')
+            .alias('streamyt')
+            .addArgument(command.createArgument('string').setName('url'))
+            .help('Stream <url> via youtube-dl')
+            .manual('Streams <url> via external youtube-dl (if enabled)')
+            .checkPermission(requirePrivileges(PLAYBACK))
+            .exec((client, args, reply, ev) => {
+                // print syntax if no url given
+                if (!args.url) {
+                    reply(USAGE_PREFIX + 'ytstream <url>');
+                    return;
+                }
+
+                if (!media.ytStream(stripURL(args.url))) {
+                    reply(ERROR_PREFIX + 'Unable to stream this URL.');
                     return;
                 }
                 successReaction(ev, reply);
@@ -661,10 +692,8 @@ registerPlugin({
                     return;
                 }
 
-                if (!media.ytdl(stripURL(args.url), true)) {
-                    reply(ERROR_PREFIX + 'Invalid URL.');
-                    return;
-                }
+                media.ytdl(stripURL(args.url), true);
+                // TODO: add success/error callback
                 successReaction(ev, reply);
             });
 
@@ -680,10 +709,8 @@ registerPlugin({
                     return;
                 }
 
-                if (!media.enqueueYt(stripURL(args.url))) {
-                    reply(ERROR_PREFIX + 'Invalid URL.');
-                    return;
-                }
+                media.enqueueYt(stripURL(args.url));
+                // TODO: add success/error callback
                 successReaction(ev, reply);
             });
 
@@ -699,10 +726,8 @@ registerPlugin({
                     return;
                 }
 
-                if (!media.enqueueYtdl(stripURL(args.url))) {
-                    reply(ERROR_PREFIX + 'Invalid URL.');
-                    return;
-                }
+                media.enqueueYtdl(stripURL(args.url));
+                // TODO: add success/error callback
                 successReaction(ev, reply);
             });
 
@@ -1014,6 +1039,13 @@ registerPlugin({
             });
         } // END COMMANDS-ENABLED
     }
+
+    event.on("ytdl.success", ev => {
+        engine.log(`Successfully downloaded YouTube Video: ${ev.url}`)
+    })
+    event.on("ytdl.error", (ev, message) => {
+        engine.log(`Error while downloading YouTube Video: ${ev.url}; ${message}`)
+    })
 
     // stores last bot client object for `getBotClient()`
     let bot = backend.getBotClient();
