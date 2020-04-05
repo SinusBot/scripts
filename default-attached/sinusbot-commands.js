@@ -899,7 +899,7 @@ registerPlugin({
                 reply('reloading...');
                 let success = engine.reloadScripts();
                 if (success) {
-                    reply(SUCCESS_PREFIX + `Scripts reloaded.\n*Please note: addning new scripts requires a complete sinusbot restart.*`);
+                    reply(SUCCESS_PREFIX + `Scripts reloaded.\n*Please note: adding new scripts requires a complete sinusbot restart.*`);
                     successReaction(ev, reply);
                 } else {
                     reply('Unable to reload scripts. Did you allow it in your `config.ini`?');
