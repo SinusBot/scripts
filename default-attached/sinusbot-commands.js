@@ -114,25 +114,20 @@ registerPlugin({
     engine.log(`SinusBot v${engine.version()} on ${engine.os()}`)
 
     /********* privileges *********/
-    /* eslint-disable no-unused-vars */
-    const LOGIN           = 1 <<  0;
-    const LIST_FILE       = 1 <<  1;
-    const UPLOAD_FILE     = 1 <<  2;
-    const DELETE_FILE     = 1 <<  3;
-    const EDIT_FILE       = 1 <<  4;
-    const CREATE_PLAYLIST = 1 <<  5;
-    const DELETE_PLAYLIST = 1 <<  6;
-    const ADDTO_PLAYLIST  = 1 <<  7;
-    const STARTSTOP       = 1 <<  8;
-    const EDITUSERS       = 1 <<  9;
-    const CHANGENICK      = 1 << 10;
-    const BROADCAST       = 1 << 11;
-    const PLAYBACK        = 1 << 12;
-    const ENQUEUE         = 1 << 13;
-    const ENQUEUENEXT     = 1 << 14;
-    const EDITBOT         = 1 << 15;
-    const EDITINSTANCE    = 1 << 16;
-    /* eslint-enable no-unused-vars */
+    const ENQUEUE           = 1 << 13;
+    const SKIP_QUEUE        = 1 << 14;
+    const ADMIN_QUEUE       = 1 << 15;
+    const PLAYBACK          = 1 << 12;
+    const START_STOP        = 1 <<  8;
+    const EDIT_BOT_SETTINGS = 1 << 16;
+    const LOGIN             = 1 <<  0;
+    const UPLOAD_FILES      = 1 <<  2;
+    const DELETE_FILES      = 1 <<  3;
+    const EDIT_FILES        = 1 <<  4;
+    const CREATE_AND_DELETE_PLAYLISTS = 1 << 5;
+    const EDIT_PLAYLISTS    = 1 <<  7;
+    const EDIT_INSTANCES    = 1 << 17;
+    const EDIT_USERS        = 1 <<  9;
 
     const ERROR_PREFIX = '❌ ';
     const WARNING_PREFIX = '⚠ ';
@@ -320,6 +315,44 @@ registerPlugin({
                 } else {
                     reply("You don't match any users.");
                 }
+                successReaction(ev, reply);
+            });
+
+            createCommand('privileges')
+            .alias('priv', 'privs')
+            .help('Show user privileges')
+            .manual('Shows user privileges.')
+            .exec((client, args, reply, ev) => {
+                let privs = [
+                    { n: ENQUEUE, s: 'Enqueue' },
+                    { n: SKIP_QUEUE, s: 'Skip Queue' },
+                    { n: ADMIN_QUEUE, s: 'Admin Queue' },
+                    { n: PLAYBACK, s: 'Playback' },
+                    { n: START_STOP, s: 'Start/Stop' },
+                    { n: EDIT_BOT_SETTINGS, s: 'Edit Bot Settings' },
+                    { n: LOGIN, s: 'Login' },
+                    { n: UPLOAD_FILES, s: 'Upload Files' },
+                    { n: DELETE_FILES, s: 'Delete Files' },
+                    { n: EDIT_FILES, s: 'Edit Files' },
+                    { n: CREATE_AND_DELETE_PLAYLISTS, s: 'Create/Delete Playlists' },
+                    { n: EDIT_PLAYLISTS, s: 'Edit Playlists' },
+                    { n: EDIT_INSTANCES, s: 'Edit Instances' },
+                    { n: EDIT_USERS, s: 'Edit Users' },
+                ];
+                let uprivs = [];
+                privs.forEach(p => {
+                    if (requirePrivileges(p.n)(client)) {
+                        uprivs.push(p.s);
+                    }
+                })
+
+                if (uprivs.length >= 1) {
+                    reply(`You have the following privileges: ${uprivs.join(", ")}.`);
+                } else {
+                    reply(`You have no privileges.`);
+                }
+                //reply(getUsersByClient(client).map(u => u.privileges().toString(2)).join(", "));
+
                 successReaction(ev, reply);
             });
 
@@ -527,7 +560,7 @@ registerPlugin({
             .addArgument(args => args.rest.setName('idORsearchstring', 'searchstring / uuid'))
             .help('Prepends a track to the queue')
             .manual('Prepends a track by its id or searches for a track and prepends the first match to the queue.')
-            .checkPermission(requirePrivileges(ENQUEUENEXT))
+            .checkPermission(requirePrivileges(SKIP_QUEUE))
             .exec((client, args, reply, ev) => {
                 // print syntax if no idORsearchstring given
                 if (!args.idORsearchstring) {
@@ -563,7 +596,7 @@ registerPlugin({
             createCommand('!stop')
             .help('Stop playback and remove idle-track')
             .manual('Stops playback and removes idle-track.')
-            .checkPermission(requirePrivileges(PLAYBACK|EDITBOT))
+            .checkPermission(requirePrivileges(PLAYBACK|EDIT_BOT_SETTINGS))
             .exec((client, args, reply, ev) => {
                 media.stop();
                 media.clearIdleTrack();
@@ -675,7 +708,7 @@ registerPlugin({
             .addArgument(args => args.string.setName('url'))
             .help('Set the TTS url.')
             .manual('Sets the TTS url.')
-            .checkPermission(requirePrivileges(EDITBOT))
+            .checkPermission(requirePrivileges(EDIT_BOT_SETTINGS))
             .exec((client, args, reply, ev) => {
                 // print syntax if no url given
                 if (!args.url) {
@@ -691,7 +724,7 @@ registerPlugin({
             .addArgument(args => args.string.setName('locale'))
             .help('Set the TTS locale.')
             .manual('Sets the TTS locale.')
-            .checkPermission(requirePrivileges(EDITBOT))
+            .checkPermission(requirePrivileges(EDIT_BOT_SETTINGS))
             .exec((client, args, reply, ev) => {
                 // print syntax if no locale given
                 if (!args.locale) {
@@ -739,7 +772,7 @@ registerPlugin({
             .addArgument(args => args.string.setName('url'))
             .help('Download and play <url> via youtube-dl')
             .manual('Plays <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts; additionally, the file will be stored.')
-            .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILE))
+            .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILES))
             .exec((client, args, reply, ev) => {
                 const url = stripURL(args.url);
                 if (!url) return reply(USAGE_PREFIX + 'ytdl <url>');
@@ -767,7 +800,7 @@ registerPlugin({
             .addArgument(args => args.string.setName('url'))
             .help('Download and enqueue <url> via youtube-dl')
             .manual('Enqueues <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts; additionally, the file will be stored.')
-            .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILE, ENQUEUE|UPLOAD_FILE))
+            .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILES, ENQUEUE|UPLOAD_FILES))
             .exec((client, args, reply, ev) => {
                 const url = stripURL(args.url);
                 if (!url) return reply(USAGE_PREFIX + 'qytdl <url>');
@@ -827,7 +860,7 @@ registerPlugin({
                 createCommand('subchan')
                 .help('Add subscription for channel')
                 .manual('Adds subscription for the channel the user is currently in. (subscription transfer-mode only)')
-                .checkPermission(client => requirePrivileges(EDITBOT)(client) && engine.isSubscriptionMode())
+                .checkPermission(client => requirePrivileges(EDIT_BOT_SETTINGS)(client) && engine.isSubscriptionMode())
                 .exec((client, args, reply, ev) => {
                     if (!engine.isSubscriptionMode()) {
                         reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
@@ -840,7 +873,7 @@ registerPlugin({
                 createCommand('unsubchan')
                 .help('Remove subscription for channel')
                 .manual('Removes subscription for the channel the user is currently in. (subscription transfer-mode only)')
-                .checkPermission(client => requirePrivileges(EDITBOT)(client) && engine.isSubscriptionMode())
+                .checkPermission(client => requirePrivileges(EDIT_BOT_SETTINGS)(client) && engine.isSubscriptionMode())
                 .exec((client, args, reply, ev) => {
                     if (!engine.isSubscriptionMode()) {
                         reply(ERROR_PREFIX + 'This command only works if Transmit-Mode is set to Subscription.');
@@ -854,7 +887,7 @@ registerPlugin({
                 .addArgument(args => args.string.setName('mode'))
                 .help('Change Transmit-Mode')
                 .manual('Changes Transmit-Mode; 0 = to channel, 1 = subscription mode')
-                .checkPermission(requirePrivileges(EDITBOT))
+                .checkPermission(requirePrivileges(EDIT_BOT_SETTINGS))
                 .exec((client, args, reply, ev) => {
                     let mode = args.mode;
                     if (typeof mode === 'string') {
@@ -886,7 +919,7 @@ registerPlugin({
             .addArgument(args => args.string.setName('value'))
             .help('Enable / disable user registration via chat')
             .manual('Enables / disables user registration via chat. Value should be either `enable` or `disable`.')
-            .checkPermission(requirePrivileges(EDITBOT))
+            .checkPermission(requirePrivileges(EDIT_BOT_SETTINGS))
             .exec((client, args, reply, ev) => {
                 switch (args.value) {
                 case "enable":
@@ -908,7 +941,7 @@ registerPlugin({
             .addArgument(args => args.string.setName('prefix'))
             .help('Change command prefix')
             .manual('Changes the prefix for all core commands to <new prefix>, default is "!".')
-            .checkPermission(requirePrivileges(EDITBOT))
+            .checkPermission(requirePrivileges(EDIT_BOT_SETTINGS))
             .exec((client, args, reply, ev) => {
                 // print syntax if no prefix given
                 if (!args.prefix) {
@@ -931,7 +964,7 @@ registerPlugin({
             createCommand('version')
             .help('Show version')
             .manual('Shows the SinusBot version.')
-            .checkPermission(requirePrivileges(EDITBOT))
+            .checkPermission(requirePrivileges(EDIT_BOT_SETTINGS))
             .exec((client, args, reply, ev) => {
                 reply(`SinusBot v${engine.version()} on ${engine.os()}\nsinusbot-commands.js v${meta.version}\ncommand.js v${command.getVersion()}`);
                 successReaction(ev, reply);
@@ -940,7 +973,7 @@ registerPlugin({
             createCommand('reload')
             .help('Reload scripts')
             .manual('Reloads scripts.\nNote: Adding new scripts requires a complete sinusbot restart.')
-            .checkPermission(requirePrivileges(EDITBOT))
+            .checkPermission(requirePrivileges(EDIT_BOT_SETTINGS))
             .exec((client, args, reply, ev) => {
                 reply('reloading...');
                 let success = engine.reloadScripts();
@@ -955,7 +988,7 @@ registerPlugin({
             createCommand('join')
             .help('Move the SinusBot to your channel')
             .manual('Moves the SinusBot into your channel.')
-            .checkPermission(requirePrivileges(STARTSTOP))
+            .checkPermission(requirePrivileges(START_STOP))
             .exec((client, args, reply, ev) => {
                 var channel = client.getChannels()[0]
                 if (!channel) {
@@ -973,7 +1006,7 @@ registerPlugin({
                 createCommand('leave')
                 .help('Disconnect the SinusBot')
                 .manual('Disconnects the SinusBot from the current voice channel.')
-                .checkPermission(requirePrivileges(STARTSTOP))
+                .checkPermission(requirePrivileges(START_STOP))
                 .exec((client, args, reply, ev) => {
                     if (!getBotClient()) {
                         return reply(ERROR_BOT_NULL)
