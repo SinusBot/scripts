@@ -226,9 +226,10 @@ registerPlugin({
                 engine.log('command.js can be found here: https://github.com/Multivit4min/Sinusbot-Command/blob/master/command.js');
                 return;
             }
+            const {createCommand} = command;
             
-            command.createCommand('register')
-            .addArgument(command.createArgument('string').setName('username'))
+            createCommand('register')
+            .addArgument(args => args.string.setName('username'))
             .help('Register a new user')
             .manual('Registers a new user bound to the Account you are using. This account has no privileges by default but can be edited by the bot administrators.')
             .exec((client, args, reply, ev) => {
@@ -271,9 +272,9 @@ registerPlugin({
                 successReaction(ev, reply);
             });
             
-            command.createCommand('password')
+            createCommand('password')
             .alias('pass')
-            .addArgument(command.createArgument('rest').setName('value'))
+            .addArgument(args => args.rest.setName('value'))
             .help('Change your password')
             .manual('Changes your password to <value>.')
             .checkPermission(client => getUserByUid(client.uid()))
@@ -304,7 +305,7 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('whoami')
+            createCommand('whoami')
             .help('Show user identities')
             .manual('Shows user identities matching your ID/groups.')
             .exec((client, args, reply, ev) => {
@@ -318,7 +319,7 @@ registerPlugin({
             });
 
             if (engine.getBackend() == 'discord') {
-                command.createCommand('playing')
+                createCommand('playing')
                 .help('Show what\'s currently playing')
                 .manual('Show what\'s currently playing')
                 .exec((client, args, reply, ev) => {
@@ -370,7 +371,7 @@ registerPlugin({
                     successReaction(ev, reply);
                 });
             } else {
-                command.createCommand('playing')
+                createCommand('playing')
                 .help('Show what\'s currently playing')
                 .manual('Show what\'s currently playing')
                 .exec((client, args, reply, ev) => {
@@ -384,7 +385,7 @@ registerPlugin({
                 });
             }
 
-            command.createCommand('next')
+            createCommand('next')
             .help('Play the next track')
             .manual('Plays the next track (only when a playlist or queue is active).')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -393,7 +394,7 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('prev')
+            createCommand('prev')
             .alias('previous')
             .help('Play the previous track')
             .manual('Plays the previous track (only when a playlistis active).')
@@ -403,9 +404,9 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('search')
+            createCommand('search')
             .alias('s')
-            .addArgument(command.createArgument('rest').setName('searchstring'))
+            .addArgument(args => args.rest.setName('searchstring'))
             .help('Search for tracks')
             .manual('Searches for tracks, returns 20 results at most.')
             .checkPermission(requirePrivileges(PLAYBACK, ENQUEUE))
@@ -428,9 +429,9 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('play')
+            createCommand('play')
             .alias('p')
-            .addArgument(command.createArgument('rest').setName('idORsearchstring', 'searchstring / uuid'))
+            .addArgument(args => args.rest.setName('idORsearchstring', 'searchstring / uuid'))
             .help('Play a track by its id or name')
             .manual('Plays a track by its id or searches for a track and plays the first match.')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -457,8 +458,8 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('playlist')
-            .addArgument(command.createArgument('rest').setName('playlistname'))
+            createCommand('playlist')
+            .addArgument(args => args.rest.setName('playlistname'))
             .help('Start playing back the playlist <playlistname>')
             .manual('starts playing back the playlist <playlistname>.')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -485,9 +486,9 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('queue')
+            createCommand('queue')
             .alias('q')
-            .addArgument(command.createArgument('rest').setName('idORsearchstring', 'searchstring / uuid').optional(true))
+            .addArgument(args => args.rest.setName('idORsearchstring', 'searchstring / uuid').optional(true))
             .help('Enqueue a track or resume queue')
             .manual('Enqueue a track by its id or search for a track and enqueue the first match. When no track is provided it wil resume the queue.')
             .checkPermission(requirePrivileges(PLAYBACK, ENQUEUE))
@@ -515,9 +516,9 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('queuenext')
+            createCommand('queuenext')
             .alias('qnext', 'qn')
-            .addArgument(command.createArgument('rest').setName('idORsearchstring', 'searchstring / uuid'))
+            .addArgument(args => args.rest.setName('idORsearchstring', 'searchstring / uuid'))
             .help('Prepends a track to the queue')
             .manual('Prepends a track by its id or searches for a track and prepends the first match to the queue.')
             .checkPermission(requirePrivileges(ENQUEUENEXT))
@@ -544,7 +545,7 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('stop')
+            createCommand('stop')
             .help('Stop playback')
             .manual('Stops playback.')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -553,7 +554,7 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('!stop')
+            createCommand('!stop')
             .help('Stop playback and remove idle-track')
             .manual('Stops playback and removes idle-track.')
             .checkPermission(requirePrivileges(PLAYBACK|EDITBOT))
@@ -563,9 +564,9 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('volume')
+            createCommand('volume')
             .alias('vol')
-            .addArgument(command.createArgument('string').setName('value'))
+            .addArgument(args => args.string.setName('value'))
             .help('Change the volume')
             .manual('Changes the volume.')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -601,8 +602,8 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('stream')
-            .addArgument(command.createArgument('string').setName('url'))
+            createCommand('stream')
+            .addArgument(args => args.string.setName('url'))
             .help('Stream a url')
             .manual('Streams from <url>; this may be http-streams like shoutcast / icecast or just remote soundfiles.')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -631,8 +632,8 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('say')
-            .addArgument(command.createArgument('rest').setName('text'))
+            createCommand('say')
+            .addArgument(args => args.rest.setName('text'))
             .help('Say a text via TTS')
             .manual('Uses text-to-speech (if configured) to say the given text.')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -647,9 +648,9 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('sayex')
-            .addArgument(command.createArgument('string').setName('locale'))
-            .addArgument(command.createArgument('rest').setName('text'))
+            createCommand('sayex')
+            .addArgument(args => args.string.setName('locale'))
+            .addArgument(args => args.rest.setName('text'))
             .help('Say a text via TTS with given locale')
             .manual('Uses text-to-speech (if configured) to say the given text with a given locale.')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -664,8 +665,8 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('ttsurl')
-            .addArgument(command.createArgument('string').setName('url'))
+            createCommand('ttsurl')
+            .addArgument(args => args.string.setName('url'))
             .help('Set the TTS url.')
             .manual('Sets the TTS url.')
             .checkPermission(requirePrivileges(EDITBOT))
@@ -680,8 +681,8 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('ttslocale')
-            .addArgument(command.createArgument('string').setName('locale'))
+            createCommand('ttslocale')
+            .addArgument(args => args.string.setName('locale'))
             .help('Set the TTS locale.')
             .manual('Sets the TTS locale.')
             .checkPermission(requirePrivileges(EDITBOT))
@@ -696,8 +697,8 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('yt')
-            .addArgument(command.createArgument('string').setName('url'))
+            createCommand('yt')
+            .addArgument(args => args.string.setName('url'))
             .help('Play <url> via youtube-dl')
             .manual('Plays <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts.')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -710,9 +711,9 @@ registerPlugin({
                 handleYT(jobId, ev, reply);
             });
 
-            command.createCommand('ytstream')
+            createCommand('ytstream')
             .alias('streamyt')
-            .addArgument(command.createArgument('string').setName('url'))
+            .addArgument(args => args.string.setName('url'))
             .help('Stream <url> via youtube-dl')
             .manual('Streams <url> via external youtube-dl (if enabled)')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -728,8 +729,8 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('ytdl')
-            .addArgument(command.createArgument('string').setName('url'))
+            createCommand('ytdl')
+            .addArgument(args => args.string.setName('url'))
             .help('Download and play <url> via youtube-dl')
             .manual('Plays <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts; additionally, the file will be stored.')
             .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILE))
@@ -742,8 +743,8 @@ registerPlugin({
                 handleYT(jobId, ev, reply);
             });
 
-            command.createCommand('qyt')
-            .addArgument(command.createArgument('string').setName('url'))
+            createCommand('qyt')
+            .addArgument(args => args.string.setName('url'))
             .help('Enqueue <url> via youtube-dl')
             .manual('Enqueues <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts.')
             .checkPermission(requirePrivileges(PLAYBACK, ENQUEUE))
@@ -756,8 +757,8 @@ registerPlugin({
                 handleYT(jobId, ev, reply);
             });
 
-            command.createCommand('qytdl')
-            .addArgument(command.createArgument('string').setName('url'))
+            createCommand('qytdl')
+            .addArgument(args => args.string.setName('url'))
             .help('Download and enqueue <url> via youtube-dl')
             .manual('Enqueues <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts; additionally, the file will be stored.')
             .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILE, ENQUEUE|UPLOAD_FILE))
@@ -770,7 +771,7 @@ registerPlugin({
                 handleYT(jobId, ev, reply);
             });
 
-            command.createCommand('shuffle')
+            createCommand('shuffle')
             .help('Toggle shuffle')
             .manual('Toggles shuffle.')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -780,7 +781,7 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('repeat')
+            createCommand('repeat')
             .help('Toggle repeat')
             .manual('Toggles repeat.')
             .checkPermission(requirePrivileges(PLAYBACK))
@@ -791,7 +792,7 @@ registerPlugin({
             });
 
             if (engine.getBackend() == 'ts3') {
-                command.createCommand('sub')
+                createCommand('sub')
                 .help('Subscribe to bot')
                 .manual('Subscribes to the bot. (subscription transfer-mode only)')
                 .checkPermission(() => engine.isSubscriptionMode())
@@ -804,7 +805,7 @@ registerPlugin({
                     successReaction(ev, reply);
                 });
 
-                command.createCommand('unsub')
+                createCommand('unsub')
                 .help('Unsubscribe from bot')
                 .manual('Unsubscribes from the bot. (subscription transfer-mode only)')
                 .checkPermission(() => engine.isSubscriptionMode())
@@ -817,7 +818,7 @@ registerPlugin({
                     successReaction(ev, reply);
                 });
 
-                command.createCommand('subchan')
+                createCommand('subchan')
                 .help('Add subscription for channel')
                 .manual('Adds subscription for the channel the user is currently in. (subscription transfer-mode only)')
                 .checkPermission(client => requirePrivileges(EDITBOT)(client) && engine.isSubscriptionMode())
@@ -830,7 +831,7 @@ registerPlugin({
                     successReaction(ev, reply);
                 });
 
-                command.createCommand('unsubchan')
+                createCommand('unsubchan')
                 .help('Remove subscription for channel')
                 .manual('Removes subscription for the channel the user is currently in. (subscription transfer-mode only)')
                 .checkPermission(client => requirePrivileges(EDITBOT)(client) && engine.isSubscriptionMode())
@@ -843,8 +844,8 @@ registerPlugin({
                     successReaction(ev, reply);
                 });
 
-                command.createCommand('mode')
-                .addArgument(command.createArgument('string').setName('mode'))
+                createCommand('mode')
+                .addArgument(args => args.string.setName('mode'))
                 .help('Change Transmit-Mode')
                 .manual('Changes Transmit-Mode; 0 = to channel, 1 = subscription mode')
                 .checkPermission(requirePrivileges(EDITBOT))
@@ -875,8 +876,8 @@ registerPlugin({
                 });
             }
 
-            command.createCommand('registration')
-            .addArgument(command.createArgument('string').setName('value'))
+            createCommand('registration')
+            .addArgument(args => args.string.setName('value'))
             .help('Enable / disable user registration via chat')
             .manual('Enables / disables user registration via chat. Value should be either `enable` or `disable`.')
             .checkPermission(requirePrivileges(EDITBOT))
@@ -897,8 +898,8 @@ registerPlugin({
                 }
             });
 
-            command.createCommand('prefix')
-            .addArgument(command.createArgument('string').setName('prefix'))
+            createCommand('prefix')
+            .addArgument(args => args.string.setName('prefix'))
             .help('Change command prefix')
             .manual('Changes the prefix for all core commands to <new prefix>, default is "!".')
             .checkPermission(requirePrivileges(EDITBOT))
@@ -914,14 +915,14 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('ping')
+            createCommand('ping')
             .help('responds with "PONG"')
             .exec((client, args, reply, ev) => {
                 reply(`PONG`);
                 successReaction(ev, reply);
             });
 
-            command.createCommand('version')
+            createCommand('version')
             .help('Show version')
             .manual('Shows the SinusBot version.')
             .checkPermission(requirePrivileges(EDITBOT))
@@ -930,7 +931,7 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            command.createCommand('reload')
+            createCommand('reload')
             .help('Reload scripts')
             .manual('Reloads scripts.\nNote: Adding new scripts requires a complete sinusbot restart.')
             .checkPermission(requirePrivileges(EDITBOT))
@@ -945,7 +946,7 @@ registerPlugin({
                 }
             });
             
-            command.createCommand('join')
+            createCommand('join')
             .help('Move the SinusBot to your channel')
             .manual('Moves the SinusBot into your channel.')
             .checkPermission(requirePrivileges(STARTSTOP))
@@ -963,7 +964,7 @@ registerPlugin({
             });
 
             if (engine.getBackend() == 'discord') {
-                command.createCommand('leave')
+                createCommand('leave')
                 .help('Disconnect the SinusBot')
                 .manual('Disconnects the SinusBot from the current voice channel.')
                 .checkPermission(requirePrivileges(STARTSTOP))
