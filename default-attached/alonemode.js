@@ -1,9 +1,9 @@
 registerPlugin({
     name: 'AloneMode',
-    version: '3.2',
+    version: '3.2.0',
     backends: ['ts3', 'discord'],
     description: 'This script will save CPU and bandwidth by stopping or muting the bot when nobody is listening anyways.',
-    author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
+    author: 'SinusBot Team', // Michael Friese, Max Schmitt, Jonas Bögle, Fabian "fabm3n"
     vars: [{
         name: 'mode',
         title: 'Mode',

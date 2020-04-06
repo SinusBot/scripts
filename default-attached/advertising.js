@@ -1,9 +1,9 @@
 registerPlugin({
     name: 'Advertising (Text)',
-    version: '3.0',
+    version: '3.0.0',
     backends: ['ts3'],
     description: 'This script will announce one of the configured lines every x seconds.',
-    author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
+    author: 'SinusBot Team', // Michael Friese, Max Schmitt, Jonas Bögle
     vars: [{
         name: 'ads',
         title: 'Ads (supports bbcode)',

@@ -1,9 +1,9 @@
 registerPlugin({
     name: 'Bookmarks!',
-    version: '3.0',
+    version: '3.0.0',
     backends: ['ts3', 'discord'],
     description: 'Enter .bookmark to save the current position, enter .resume to seek to the bookmarked position.',
-    author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
+    author: 'SinusBot Team', // Michael Friese, Max Schmitt, Jonas Bögle
     vars: []
 }, () => {
     const store = require('store')

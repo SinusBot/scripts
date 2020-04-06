@@ -1,9 +1,9 @@
 registerPlugin({
     name: 'Follow Me',
-    version: '3.0',
+    version: '3.0.0',
     backends: ['ts3', 'discord'],
     description: 'The bot will follow the movements of any of the clients given',
-    author: 'Michael Friese <michael@sinusbot.com>, Max Schmitt <max@schmitt.mx>',
+    author: 'SinusBot Team', // Michael Friese, Max Schmitt, Jonas Bögle
     vars: [{
         name: 'clientUids',
         title: 'Comma-separated list of client-UIDs that the bot should follow',
