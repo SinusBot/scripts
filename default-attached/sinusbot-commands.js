@@ -328,11 +328,12 @@ registerPlugin({
                 .help('Show what\'s currently playing')
                 .manual('Show what\'s currently playing')
                 .exec((client, args, reply, ev) => {
+                    let msg = getPlayingEmbed();
                     if (!audio.isPlaying()) {
-                        return reply('There is nothing playing at the moment.');
+                        msg.content = 'There is nothing playing at the moment.';
                     }
 
-                    backend.extended().createMessage(ev.channel.id(), getPlayingEmbed(), (err, res) => {
+                    backend.extended().createMessage(ev.channel.id(), msg, (err, res) => {
                         if (err) return engine.log(err);
                         if (!res) return engine.log('Error: empty response');
 
@@ -1139,6 +1140,11 @@ registerPlugin({
      */
     function getPlayingEmbed() {
         let track = media.getCurrentTrack();
+
+        if (!track) {
+            return {};
+        }
+
         let album = track.album();
         let duration = track.duration();
 
@@ -1159,7 +1165,7 @@ registerPlugin({
         return {
             embed: {
                 title: formatTrack(track),
-                url: sinusbotURL ? sinusbotURL : null,
+                url: sinusbotURL || null,
                 color: 0xe13438,
                 thumbnail: {
                     url: sinusbotURL && track.thumbnail() ? `${sinusbotURL}/cache/${track.thumbnail()}` : null
