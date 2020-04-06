@@ -163,6 +163,58 @@ registerPlugin({
         engine.saveConfig(config);
     }
 
+    const ytCallbacks = {};
+    event.on("ytdl.success", ev => {
+        engine.log(`Downloaded YouTube Video: ${ev.url}`);
+        const jobId = ev.jobId;
+        if (typeof ytCallbacks[jobId] === 'function') {
+            ytCallbacks[jobId](ev);
+            delete ytCallbacks[jobId];
+        }
+    });
+
+    event.on("ytdl.error", (ev, message) => {
+        engine.log(`Error while downloading YouTube Video: ${ev.url}; ${message}`);
+        if (message.startsWith("exit status")) {
+            engine.log('Please see "Upload" page in web-interface for more details and read the documentation for troubleshooting advice: https://sinusbot.github.io/docs/youtube-dl/');
+        }
+
+        const jobId = ev.jobId;
+        if (typeof ytCallbacks[jobId] === 'function') {
+            ytCallbacks[jobId](ev, message);
+            delete ytCallbacks[jobId];
+        }
+    });
+
+    /**
+     * Registers a callback for success/error events of a given jobId.
+     * @param {string} jobId Job ID
+     * @param {(ev: {url: string, jobId: string, trackId?: string}, message: string) => void} callback Callback
+     */
+    function ytCallback(jobId, callback) {
+        ytCallbacks[jobId] = callback;
+    }
+
+    /**
+     * 
+     * @param {string} jobId Job ID
+     * @param {MessageEvent} ev Event
+     * @param {(msg: string) => void} reply
+     */
+    function handleYT(jobId, ev, reply) {
+        ytCallback(jobId, (ytev, err) => {
+            if (err) {
+                if (err.startsWith("exit status")) {
+                    reply(ERROR_PREFIX + `Error: ${err}; Please see "Upload" page in web-interface for more details.`);
+                } else {
+                    reply(ERROR_PREFIX + `Error: ${err}`);
+                }
+                return;
+            }
+            successReaction(ev, reply);
+        });
+    }
+
     if (config.disable) {
         engine.log('SinusBot commands are DISABLED.');
     } else { // BEGIN COMMANDS-ENABLED
@@ -655,9 +707,8 @@ registerPlugin({
                     return;
                 }
 
-                media.yt(stripURL(args.url));
-                // TODO: add success/error callback
-                successReaction(ev, reply);
+                const jobId = media.yt(stripURL(args.url));
+                handleYT(jobId, ev, reply);
             });
 
             command.createCommand('ytstream')
@@ -692,9 +743,8 @@ registerPlugin({
                     return;
                 }
 
-                media.ytdl(stripURL(args.url), true);
-                // TODO: add success/error callback
-                successReaction(ev, reply);
+                const jobId = media.ytdl(stripURL(args.url), true);
+                handleYT(jobId, ev, reply);
             });
 
             command.createCommand('qyt')
@@ -709,9 +759,8 @@ registerPlugin({
                     return;
                 }
 
-                media.enqueueYt(stripURL(args.url));
-                // TODO: add success/error callback
-                successReaction(ev, reply);
+                const jobId = media.enqueueYt(stripURL(args.url));
+                handleYT(jobId, ev, reply);
             });
 
             command.createCommand('qytdl')
@@ -726,9 +775,8 @@ registerPlugin({
                     return;
                 }
 
-                media.enqueueYtdl(stripURL(args.url));
-                // TODO: add success/error callback
-                successReaction(ev, reply);
+                const jobId = media.enqueueYtdl(stripURL(args.url));
+                handleYT(jobId, ev, reply);
             });
 
             command.createCommand('shuffle')
@@ -1039,13 +1087,6 @@ registerPlugin({
             });
         } // END COMMANDS-ENABLED
     }
-
-    event.on("ytdl.success", ev => {
-        engine.log(`Successfully downloaded YouTube Video: ${ev.url}`)
-    })
-    event.on("ytdl.error", (ev, message) => {
-        engine.log(`Error while downloading YouTube Video: ${ev.url}; ${message}`)
-    })
 
     // stores last bot client object for `getBotClient()`
     let bot = backend.getBotClient();
