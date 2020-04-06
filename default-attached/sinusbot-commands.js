@@ -1142,7 +1142,10 @@ registerPlugin({
         let track = media.getCurrentTrack();
 
         if (!track) {
-            return {};
+            return {
+                content: "",
+                embed: {},
+            };
         }
 
         let album = track.album();
@@ -1163,6 +1166,7 @@ registerPlugin({
         }
 
         return {
+            content: formatTrack(track),
             embed: {
                 title: formatTrack(track),
                 url: sinusbotURL || null,
@@ -1175,7 +1179,7 @@ registerPlugin({
                     icon_url: "https://sinusbot.github.io/logo.png",
                     text: "SinusBot"
                 }
-            }
+            },
         };
     }
 
