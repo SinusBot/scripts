@@ -311,7 +311,12 @@ registerPlugin({
             .exec((client, args, reply, ev) => {
                 let users = getUsersByClient(client);
                 if (users && users.length != 0) {
-                    reply(`You match the following users: ${users.map(user => user.name()).join(", ")}.`);
+                    const usersStr = users.map(user => user.name()).join(", ");
+                    if (users.length == 1) {
+                        reply(`You match the following user: ${usersStr}.`);
+                    } else {
+                        reply(`You match the following ${users.length} users: ${usersStr}.`);
+                    }
                 } else {
                     reply("You don't match any users.");
                 }
