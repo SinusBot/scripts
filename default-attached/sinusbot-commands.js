@@ -763,7 +763,18 @@ registerPlugin({
                 if (!url.match(PATTERN_URL)) return reply(ERROR_PREFIX + 'Invalid URL.');
 
                 const jobId = media.yt(url);
-                handleYT(jobId, ev, reply);
+                ytCallback(jobId, (ytev, err) => {
+                    if (err) {
+                        // try to stream
+                        if (!media.ytStream(url)) {
+                            if (err.startsWith("exit status")) {
+                                return reply(ERROR_PREFIX + `Error: ${err}; Please see "Upload" page in web-interface for more details.`);
+                            }
+                            return reply(ERROR_PREFIX + `Error: ${err}`);
+                        }
+                    }
+                    successReaction(ev, reply);
+                });
             });
 
             createCommand('ytstream')
@@ -778,8 +789,7 @@ registerPlugin({
                 if (!url.match(PATTERN_URL)) return reply(ERROR_PREFIX + 'Invalid URL.');
 
                 if (!media.ytStream(url)) {
-                    reply(ERROR_PREFIX + 'Unable to stream this URL.');
-                    return;
+                    return reply(ERROR_PREFIX + 'Unable to stream this URL.');
                 }
                 successReaction(ev, reply);
             });
