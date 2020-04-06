@@ -475,20 +475,36 @@ registerPlugin({
             .manual('Plays a track by its id or searches for a track and plays the first match.')
             .checkPermission(requirePrivileges(PLAYBACK))
             .exec((client, args, reply, ev) => {
+                let query = args.idORsearchstring;
                 // print syntax if no idORsearchstring given
-                if (!args.idORsearchstring) {
+                if (!query) {
                     reply(USAGE_PREFIX + 'play <searchstring / uuid>');
                     return;
                 }
 
-                let track = media.getTrackByID(args.idORsearchstring);
+                let track = media.getTrackByID(query);
                 if (!track) {
-                    let tracks = media.search(args.idORsearchstring);
+                    let tracks = media.search(query);
                     if (tracks.length > 0) {
                         track = tracks[0];
                     } else {
-                        reply('Sorry, nothing found.');
-                        return;
+                        query = stripURL(query);
+                        if (query.match(PATTERN_URL)) {
+                            if (!query.match(PATTERN_YT_DOMAIN)) {
+                                if (media.playURL(query)) {
+                                    successReaction(ev, reply);
+                                    return;
+                                }
+                            }
+                            if (media.ytStream(query)) {
+                                successReaction(ev, reply);
+                                return;
+                            }
+                            const jobId = media.yt(query);
+                            handleYT(jobId, ev, reply);
+                            return;
+                        }
+                        return reply('Sorry, nothing found.');
                     }
                 }
 
