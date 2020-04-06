@@ -145,7 +145,8 @@ registerPlugin({
     const REACTION_NEXT = '⏭';
     const REACTION_SUCCESS = '✅';
 
-    const YT_DOMAIN = /^https?:\/\/(?:www\.)?youtube\.com\//i;
+    const PATTERN_URL = /^https?:\/\/\S+/i;
+    const PATTERN_YT_DOMAIN = /^https?:\/\/(?:www\.)?youtube\.com\//i;
 
     // for join/leave
     const ERROR_BOT_NULL = ERROR_PREFIX+'Unable to change channel.\nTry to set a *Default Channel* in the webinterface and click save.'
@@ -614,7 +615,7 @@ registerPlugin({
 
                 const url = stripURL(args.url);
 
-                if (url.match(YT_DOMAIN)) {
+                if (url.match(PATTERN_YT_DOMAIN)) {
                     if (!media.ytStream(url)) {
                         reply(ERROR_PREFIX + 'Unable to stream this YouTube URL.');
                         return;
@@ -701,13 +702,11 @@ registerPlugin({
             .manual('Plays <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts.')
             .checkPermission(requirePrivileges(PLAYBACK))
             .exec((client, args, reply, ev) => {
-                // print syntax if no url given
-                if (!args.url) {
-                    reply(USAGE_PREFIX + 'yt <url>');
-                    return;
-                }
+                const url = stripURL(args.url);
+                if (!url) return reply(USAGE_PREFIX + 'yt <url>');
+                if (!url.match(PATTERN_URL)) return reply(ERROR_PREFIX + 'Invalid URL.');
 
-                const jobId = media.yt(stripURL(args.url));
+                const jobId = media.yt(url);
                 handleYT(jobId, ev, reply);
             });
 
@@ -718,13 +717,11 @@ registerPlugin({
             .manual('Streams <url> via external youtube-dl (if enabled)')
             .checkPermission(requirePrivileges(PLAYBACK))
             .exec((client, args, reply, ev) => {
-                // print syntax if no url given
-                if (!args.url) {
-                    reply(USAGE_PREFIX + 'ytstream <url>');
-                    return;
-                }
+                const url = stripURL(args.url);
+                if (!url) return reply(USAGE_PREFIX + 'ytstream <url>');
+                if (!url.match(PATTERN_URL)) return reply(ERROR_PREFIX + 'Invalid URL.');
 
-                if (!media.ytStream(stripURL(args.url))) {
+                if (!media.ytStream(url)) {
                     reply(ERROR_PREFIX + 'Unable to stream this URL.');
                     return;
                 }
@@ -737,13 +734,11 @@ registerPlugin({
             .manual('Plays <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts; additionally, the file will be stored.')
             .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILE))
             .exec((client, args, reply, ev) => {
-                // print syntax if no url given
-                if (!args.url) {
-                    reply(USAGE_PREFIX + 'ytdl <url>');
-                    return;
-                }
+                const url = stripURL(args.url);
+                if (!url) return reply(USAGE_PREFIX + 'ytdl <url>');
+                if (!url.match(PATTERN_URL)) return reply(ERROR_PREFIX + 'Invalid URL.');
 
-                const jobId = media.ytdl(stripURL(args.url), true);
+                const jobId = media.ytdl(url, true);
                 handleYT(jobId, ev, reply);
             });
 
@@ -753,13 +748,11 @@ registerPlugin({
             .manual('Enqueues <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts.')
             .checkPermission(requirePrivileges(PLAYBACK, ENQUEUE))
             .exec((client, args, reply, ev) => {
-                // print syntax if no url given
-                if (!args.url) {
-                    reply(USAGE_PREFIX + 'qyt <url>');
-                    return;
-                }
+                const url = stripURL(args.url);
+                if (!url) return reply(USAGE_PREFIX + 'qyt <url>');
+                if (!url.match(PATTERN_URL)) return reply(ERROR_PREFIX + 'Invalid URL.');
 
-                const jobId = media.enqueueYt(stripURL(args.url));
+                const jobId = media.enqueueYt(url);
                 handleYT(jobId, ev, reply);
             });
 
@@ -769,13 +762,11 @@ registerPlugin({
             .manual('Enqueues <url> via external youtube-dl (if enabled); beware: the file will be downloaded first and played back afterwards, so there might be a slight delay before playback starts; additionally, the file will be stored.')
             .checkPermission(requirePrivileges(PLAYBACK|UPLOAD_FILE, ENQUEUE|UPLOAD_FILE))
             .exec((client, args, reply, ev) => {
-                // print syntax if no url given
-                if (!args.url) {
-                    reply(USAGE_PREFIX + 'qytdl <url>');
-                    return;
-                }
+                const url = stripURL(args.url);
+                if (!url) return reply(USAGE_PREFIX + 'qytdl <url>');
+                if (!url.match(PATTERN_URL)) return reply(ERROR_PREFIX + 'Invalid URL.');
 
-                const jobId = media.enqueueYtdl(stripURL(args.url));
+                const jobId = media.enqueueYtdl(url);
                 handleYT(jobId, ev, reply);
             });
 
