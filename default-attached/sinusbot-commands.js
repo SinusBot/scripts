@@ -141,7 +141,7 @@ registerPlugin({
     const REACTION_SUCCESS = '✅';
 
     const PATTERN_URL = /^https?:\/\/\S+/i;
-    const PATTERN_YT_DOMAIN = /^https?:\/\/(?:www\.)?youtube\.com\//i;
+    const PATTERN_YT_DOMAIN = /^https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\//i;
 
     // for join/leave
     const ERROR_BOT_NULL = ERROR_PREFIX+'Unable to change channel.\nTry to set a *Default Channel* in the webinterface and click save.'
