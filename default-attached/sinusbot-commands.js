@@ -1043,107 +1043,7 @@ registerPlugin({
                 });
             }
         });
-
-        /********** !playing stuff for discord **********/
-        if (engine.getBackend() == 'discord') {
-            event.on('discord:MESSAGE_REACTION_ADD', ev => {
-                let ename = ev.emoji.name;
-                // remove 0xefb88f aka. "VARIATION SELECTOR-16" (no idea why discord puts that at the end)
-                if (ename.endsWith('\ufe0f')) {
-                    ename = ename.slice(0, -1);
-                }
-                const emoji = ev.emoji.id ? `${ename}:${ev.emoji.id}` : ename;
-
-                // ignore reactions that are not controls
-                if (![REACTION_PREV, REACTION_PLAYPAUSE, REACTION_NEXT].includes(emoji)) return;
-
-                // ignore reactions from the bot itself
-                if (backend.getBotClientID().endsWith(ev.user_id)) return;
-
-                // get user via id
-                const client = backend.getClientByID(ev.guild_id ? `${ev.guild_id}/${ev.user_id}` : ev.user_id);
-
-                // ignore if no matching user found or reaction from the bot itself
-                if (!client || client.isSelf()) return;
-
-                let callback = () => {
-                    // delete the rection
-                    deleteUserReaction(ev.channel_id, ev.message_id, ev.user_id, emoji);
-
-                    // check if user has the 'playback' permission
-                    if (!requirePrivileges(PLAYBACK)(client)) {
-                        engine.log(`${client.nick()} is missing playback permissions for reaction controls`);
-                        client.chat(ERROR_PREFIX + 'You need the playback permission to use reaction controls');
-                        return;
-                    }
-
-                    const track = media.getCurrentTrack();
-
-                    switch (emoji) {
-                    case REACTION_PREV:
-                        // ignore if nothing is playing
-                        if (!audio.isPlaying()) return;
-
-                        if (media.getQueue().length !== 0) {
-                            // start from beginning if we're playing queue
-                            audio.seek(0);
-                        } else {
-                            // try prev (doesn't work for queue or folder)
-                            media.playPrevious();
-
-                            // fallback: start from beginning if there is no previous track
-                            if (!audio.isPlaying()) {
-                                if (track) track.play();
-                            }
-                        }
-                        break;
-                    case REACTION_PLAYPAUSE:
-                        if (audio.isPlaying()) {
-                            media.stop();
-                        } else {
-                            if (!track) return;
-                            const pos = audio.getTrackPosition();
-
-                            if (pos && pos < (track.duration() - 1000 /* milliseconds */)) {
-                                // continue playing at last pos
-                                audio.setMute(true);
-                                track.play();
-                                audio.seek(pos);
-                                audio.setMute(false);
-                            } else {
-                                // or start from beginning if it already ended
-                                track.play();
-                            }
-                        }
-                        break;
-                    case REACTION_NEXT:
-                        if (audio.isPlaying()) {
-                            media.playNext();
-                        } else {
-                            // is something in queue?
-                            if (media.getQueue().length !== 0) {
-                                // resume queue
-                                media.playQueueNext();
-                            }
-                        }
-                    }
-                };
-
-                // was reaction added to previous response?
-                if (lastEmbeds.some(embed => embed.messageId == ev.message_id)) {
-                    callback();
-                    return;
-                }
-
-                getMessage(ev.channel_id, ev.message_id).then(msg => {
-                    // was reaction added to previous response of the bot?
-                    if (backend.getBotClientID().endsWith(msg.author.id)) {
-                        callback();
-                    }
-                })
-            });
-        } // END COMMANDS-ENABLED
-    }
+    } // END COMMANDS-ENABLED
 
     // stores last bot client object for `getBotClient()`
     let bot = backend.getBotClient();
@@ -1157,42 +1057,142 @@ registerPlugin({
         return bot;
     }
 
-    /**
-     * Called when track or it's info changes
-     * @param {Track} track
-     */
-    const onChange = track => {
-        if (config.songInStatus) {
-            const prefix = '🎵 ';
-            const suffix = ' 🎵';
+    /********** !playing stuff for discord **********/
+    if (engine.getBackend() == 'discord') {
+        event.on('discord:MESSAGE_REACTION_ADD', ev => {
+            let ename = ev.emoji.name;
+            // remove 0xefb88f aka. "VARIATION SELECTOR-16" (no idea why discord puts that at the end)
+            if (ename.endsWith('\ufe0f')) {
+                ename = ename.slice(0, -1);
+            }
+            const emoji = ev.emoji.id ? `${ename}:${ev.emoji.id}` : ename;
 
-            // set track info as status
-            backend.extended().setStatus({
-                game: {
-                    name: prefix + formatTrack(track) + suffix,
-                    type: 2, // => 0 (game), 1 (streaming), 2 (listening)
-                },
-                status: "online",
-                afk: false
-            });
-        }
+            // ignore reactions that are not controls
+            if (![REACTION_PREV, REACTION_PLAYPAUSE, REACTION_NEXT].includes(emoji)) return;
 
-        // update embeds
-        lastEmbeds.forEach(async embed => {
-            await editMessage(embed.channelId, embed.messageId, getPlayingEmbed()).then(() => wait(100));
+            // ignore reactions from the bot itself
+            if (backend.getBotClientID().endsWith(ev.user_id)) return;
+
+            // get user via id
+            const client = backend.getClientByID(ev.guild_id ? `${ev.guild_id}/${ev.user_id}` : ev.user_id);
+
+            // ignore if no matching user found or reaction from the bot itself
+            if (!client || client.isSelf()) return;
+
+            let callback = () => {
+                // delete the rection
+                deleteUserReaction(ev.channel_id, ev.message_id, ev.user_id, emoji);
+
+                // check if user has the 'playback' permission
+                if (!requirePrivileges(PLAYBACK)(client)) {
+                    engine.log(`${client.nick()} is missing playback permissions for reaction controls`);
+                    client.chat(ERROR_PREFIX + 'You need the playback permission to use reaction controls');
+                    return;
+                }
+
+                const track = media.getCurrentTrack();
+
+                switch (emoji) {
+                case REACTION_PREV:
+                    // ignore if nothing is playing
+                    if (!audio.isPlaying()) return;
+
+                    if (media.getQueue().length !== 0) {
+                        // start from beginning if we're playing queue
+                        audio.seek(0);
+                    } else {
+                        // try prev (doesn't work for queue or folder)
+                        media.playPrevious();
+
+                        // fallback: start from beginning if there is no previous track
+                        if (!audio.isPlaying()) {
+                            if (track) track.play();
+                        }
+                    }
+                    break;
+                case REACTION_PLAYPAUSE:
+                    if (audio.isPlaying()) {
+                        media.stop();
+                    } else {
+                        if (!track) return;
+                        const pos = audio.getTrackPosition();
+
+                        if (pos && pos < (track.duration() - 1000 /* milliseconds */)) {
+                            // continue playing at last pos
+                            audio.setMute(true);
+                            track.play();
+                            audio.seek(pos);
+                            audio.setMute(false);
+                        } else {
+                            // or start from beginning if it already ended
+                            track.play();
+                        }
+                    }
+                    break;
+                case REACTION_NEXT:
+                    if (audio.isPlaying()) {
+                        media.playNext();
+                    } else {
+                        // is something in queue?
+                        if (media.getQueue().length !== 0) {
+                            // resume queue
+                            media.playQueueNext();
+                        }
+                    }
+                }
+            };
+
+            // was reaction added to previous response?
+            if (lastEmbeds.some(embed => embed.messageId == ev.message_id)) {
+                callback();
+                return;
+            }
+
+            getMessage(ev.channel_id, ev.message_id).then(msg => {
+                // was reaction added to previous response of the bot?
+                if (backend.getBotClientID().endsWith(msg.author.id)) {
+                    callback();
+                }
+            })
         });
-    };
-
-    event.on('track', onChange);
-    event.on('trackInfo', onChange);
-    event.on('trackEnd', () => {
-        if (!config.songInStatus) {
-            return;
-        }
-        if (getBotClient()) {
-            bot.setDescription('');
-        }
-    });
+        
+        /**
+        * Called when track or it's info changes
+        * @param {Track} track
+        */
+        const onChange = track => {
+            if (config.songInStatus) {
+                const prefix = '🎵 ';
+                const suffix = ' 🎵';
+    
+                // set track info as status
+                backend.extended().setStatus({
+                    game: {
+                        name: prefix + formatTrack(track) + suffix,
+                        type: 2, // => 0 (game), 1 (streaming), 2 (listening)
+                    },
+                    status: "online",
+                    afk: false
+                });
+            }
+    
+            // update embeds
+            lastEmbeds.forEach(async embed => {
+                await editMessage(embed.channelId, embed.messageId, getPlayingEmbed()).then(() => wait(100));
+            });
+        };
+    
+        event.on('track', onChange);
+        event.on('trackInfo', onChange);
+        event.on('trackEnd', () => {
+            if (!config.songInStatus) {
+                return;
+            }
+            if (getBotClient()) {
+                bot.setDescription('');
+            }
+        });
+    }
 
     /**
      * Returns embed for current track
