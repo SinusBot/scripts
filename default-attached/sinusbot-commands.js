@@ -959,7 +959,7 @@ registerPlugin({
                     successReaction(ev, reply);
                     break;
                 default:
-                    reply(`Registartion is currently ${engine.registrationEnabled() ? 'en' : 'dis'}abled.\n` + USAGE_PREFIX + 'registration <enable|disable>');
+                    reply(`Registration is currently ${engine.registrationEnabled() ? 'en' : 'dis'}abled.\n` + USAGE_PREFIX + 'registration <enable|disable>');
                 }
             });
 
