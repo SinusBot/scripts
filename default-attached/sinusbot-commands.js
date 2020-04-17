@@ -59,18 +59,18 @@ registerPlugin({
             title: 'Add a reaction to each command if it was successfull.',
             type: 'checkbox',
             default: false,
-            conditions: [
+            /* conditions: [
                 { field: 'disable', value: false }
-            ],
+            ], */ // conditions checking for "false" are currently buggy. @flyth needs to fix this.
         },
         {
             name: 'discord',
             title: 'Show discord settings',
             type: 'checkbox',
             default: true,
-            conditions: [
+            /* conditions: [
                 { field: 'disable', value: false }
-            ],
+            ], */ // conditions checking for "false" are currently buggy. @flyth needs to fix this.
         },
         {
             name: 'url',
@@ -79,8 +79,8 @@ registerPlugin({
             placeholder: 'i.e. https://sinusbot.example.com',
             conditions: [
                 { field: 'discord', value: true },
-                { field: 'disable', value: false }
-            ],
+                /*{ field: 'disable', value: false }*/
+            ], // conditions checking for "false" are currently buggy. @flyth needs to fix this.
         },
         {
             name: 'songInStatus',
@@ -98,8 +98,8 @@ registerPlugin({
             default: true,
             conditions: [
                 { field: 'discord', value: true },
-                { field: 'disable', value: false }
-            ],
+                /*{ field: 'disable', value: false }*/
+            ], // conditions checking for "false" are currently buggy. @flyth needs to fix this.
         }
     ]
 }, (_, config, meta) => {
