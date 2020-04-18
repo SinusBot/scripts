@@ -33,7 +33,7 @@
  */
 registerPlugin({
     name: 'SinusBot Commands',
-    version: '1.1.1',
+    version: '1.1.2',
     description: 'Enables the default commands.',
     author: 'Jonas Bögle (@irgendwr)',
     engine: '>= 1.0.0',
@@ -139,6 +139,7 @@ registerPlugin({
     const REACTION_PLAYPAUSE = '⏯';
     const REACTION_NEXT = '⏭';
     const REACTION_SUCCESS = '✅';
+    const HIDE_REACTIONS_IF_PRIVATE = false;
 
     const PATTERN_URL = /^https?:\/\/\S+/i;
     const PATTERN_YT_DOMAIN = /^https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\//i;
@@ -356,64 +357,11 @@ registerPlugin({
                 successReaction(ev, reply);
             });
 
-            if (engine.getBackend() == 'discord') {
-                createCommand('playing')
-                .help('Show what\'s currently playing')
-                .manual('Show what\'s currently playing')
-                .exec((client, args, reply, ev) => {
-                    let msg = getPlayingEmbed();
-                    if (!audio.isPlaying()) {
-                        msg.content = 'There is nothing playing at the moment.';
-                    }
-
-                    backend.extended().createMessage(ev.channel.id(), msg, (err, res) => {
-                        if (err) return engine.log(err);
-                        if (!res) return engine.log('Error: empty response');
-
-                        const {id, channel_id} = JSON.parse(res);
-
-                        // messages that should be deleted
-                        let deleteMsg = [];
-                        const msgId = ev.message ? ev.message.ID() : null;
-                        const index = lastEmbeds.findIndex(embed => embed.channelId == channel_id);
-                        if (index !== -1) {
-                            if (config.deleteOldMessages) {
-                                // delete previous embed
-                                deleteMsg.push(lastEmbeds[index].messageId);
-                                // delete previous command from user
-                                if (lastEmbeds[index].messageId) {
-                                    deleteMsg.push(lastEmbeds[index].invokeMessageId);
-                                }
-                            }
-                            // save new embed
-                            lastEmbeds[index].messageId = id;
-                            lastEmbeds[index].invokeMessageId = msgId;
-                        } else {
-                            // save new embed
-                            lastEmbeds.push({
-                                channelId: channel_id,
-                                messageId: id,
-                                invokeMessageId: msgId
-                            });
-                        }
-
-                        deleteMessages(channel_id, deleteMsg);
-                        
-                        wait(1000)
-                        // create reaction controls
-                        .then(() => createReaction(channel_id, id, REACTION_PREV))
-                        .then(() => wait(150))
-                        .then(() => createReaction(channel_id, id, REACTION_PLAYPAUSE))
-                        .then(() => wait(150))
-                        .then(() => createReaction(channel_id, id, REACTION_NEXT));
-                    });
-                    successReaction(ev, reply);
-                });
-            } else {
-                createCommand('playing')
-                .help('Show what\'s currently playing')
-                .manual('Show what\'s currently playing')
-                .exec((client, args, reply, ev) => {
+            createCommand('playing')
+            .help('Show what\'s currently playing')
+            .manual('Show what\'s currently playing')
+            .exec((client, args, reply, ev) => {
+                if (engine.getBackend() !== 'discord' || !ev.message) {
                     if (!audio.isPlaying()) {
                         successReaction(ev, reply);
                         return reply('There is nothing playing at the moment.');
@@ -421,8 +369,59 @@ registerPlugin({
 
                     reply(formatTrack(media.getCurrentTrack()));
                     successReaction(ev, reply);
+                    return;
+                }
+
+                let msg = getPlayingEmbed();
+                if (!audio.isPlaying()) {
+                    msg.content = 'There is nothing playing at the moment.';
+                }
+
+                backend.extended().createMessage(ev.message.channelID(), msg, (err, res) => {
+                    if (err) return engine.log(err);
+                    if (!res) return engine.log('Error: empty response');
+
+                    const {id, channel_id} = JSON.parse(res);
+
+                    // messages that should be deleted
+                    let deleteMsg = [];
+                    const msgId = ev.message ? ev.message.ID() : null;
+                    const index = lastEmbeds.findIndex(embed => embed.channelId == channel_id);
+                    if (index !== -1) {
+                        if (config.deleteOldMessages) {
+                            // delete previous embed
+                            deleteMsg.push(lastEmbeds[index].messageId);
+                            // delete previous command from user
+                            if (lastEmbeds[index].messageId) {
+                                deleteMsg.push(lastEmbeds[index].invokeMessageId);
+                            }
+                        }
+                        // save new embed
+                        lastEmbeds[index].messageId = id;
+                        lastEmbeds[index].invokeMessageId = msgId;
+                    } else {
+                        // save new embed
+                        lastEmbeds.push({
+                            channelId: channel_id,
+                            messageId: id,
+                            invokeMessageId: msgId
+                        });
+                    }
+
+                    deleteMessages(channel_id, deleteMsg);
+
+                    if (HIDE_REACTIONS_IF_PRIVATE && ev.mode === 1) return;
+                    
+                    wait(1000)
+                    // create reaction controls
+                    .then(() => createReaction(channel_id, id, REACTION_PREV))
+                    .then(() => wait(150))
+                    .then(() => createReaction(channel_id, id, REACTION_PLAYPAUSE))
+                    .then(() => wait(150))
+                    .then(() => createReaction(channel_id, id, REACTION_NEXT));
                 });
-            }
+                successReaction(ev, reply);
+            });
 
             createCommand('next')
             .help('Play the next track')
@@ -1074,10 +1073,19 @@ registerPlugin({
             if (backend.getBotClientID().endsWith(ev.user_id)) return;
 
             // get user via id
-            const client = backend.getClientByID(ev.guild_id ? `${ev.guild_id}/${ev.user_id}` : ev.user_id);
+            let client = backend.getClientByID(`${ev.guild_id || backend.getBotClientID().split('/')[0]}/${ev.user_id}`);
+
+            if (!client) {
+                engine.log(`playing controls: using workaround for client '${ev.user_id}'`);
+                // @ts-ignore: workaround
+                client = fakeClient(ev.guild_id || backend.getBotClientID().split('/')[0], ev.user_id, ev.channel_id);
+            }
 
             // ignore if no matching user found or reaction from the bot itself
-            if (!client || client.isSelf()) return;
+            if (!client) return engine.log(`playing controls: could not find client '${ev.user_id}'`);
+
+            // ignore if reaction is from the bot itself
+            if (client.isSelf()) return;
 
             let callback = () => {
                 // delete the rection
@@ -1242,6 +1250,48 @@ registerPlugin({
         };
     }
 
+    /**
+     * Returns a fake client object from IDs. (Discord only)
+     * @param {string} guild Guild ID
+     * @param {string} id User ID
+     * @param {string} channelid Channel ID
+     */
+    function fakeClient(guild, id, channelid) {
+        const clid = `${guild}/${id}`
+        return {
+            chat: (/** @type {string} */ str) => {
+                backend.extended().createMessage(channelid, {
+                    content: str
+                });
+            },
+            isSelf: () => false,
+            id: () => clid,
+            uid: () => clid,
+            uniqueId: () => clid,
+            uniqueID: () => clid,
+            DBID: () => clid,
+            databaseID: () => clid,
+            databaseId: () => clid,
+            type: () => 1,
+            getURL: () => `<@${id}>`,
+            name: () => `unknown (ID: ${id})`,
+            nick: () => `unknown (ID: ${id})`,
+            phoneticName: () => '',
+            description: () => '',
+            getServerGroups: () => [],
+            getChannelGroup: () => null,
+            getChannels: () => [],
+            getAudioChannel: () => null,
+            equals: (/** @type {Client} */ client) => {
+              const uid = client.uid().split("/")
+              if (uid.length === 2) {
+                return uid[2] === id
+              } else {
+                return client.uid() === clid
+              }
+            }
+        }
+    }
 
     /********** helper functions **********/
 
