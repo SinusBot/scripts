@@ -1017,15 +1017,26 @@ registerPlugin({
             .exec((client, args, reply, ev) => {
                 var channel = client.getChannels()[0]
                 if (!channel) {
-                    return reply(ERROR_PREFIX+'I\'m unable to join your channel :(')
+                    return reply(ERROR_PREFIX+'I\'m unable to join your channel :(');
                 }
 
                 if (!getBotClient()) {
-                    return reply(ERROR_BOT_NULL)
+                    return reply(ERROR_BOT_NULL);
                 }
-                bot.moveTo(channel)
+                bot.moveTo(channel);
+                engine.setDefaultChannelID(channel.id())
                 successReaction(ev, reply);
             });
+            
+            /* // currently not working due to a bug.
+            createCommand('disconnect')
+            .help('Disconnect the SinusBot')
+            .manual('Disconnects the SinusBot.')
+            .checkPermission(requirePrivileges(START_STOP))
+            .exec((client, args, reply, ev) => {
+                backend.disconnect()
+            });
+            // */
 
             if (engine.getBackend() == 'discord') {
                 createCommand('leave')
@@ -1034,10 +1045,11 @@ registerPlugin({
                 .checkPermission(requirePrivileges(START_STOP))
                 .exec((client, args, reply, ev) => {
                     if (!getBotClient()) {
-                        return reply(ERROR_BOT_NULL)
+                        return reply(ERROR_BOT_NULL);
                     }
                     
-                    bot.moveTo('')
+                    bot.moveTo('');
+                    engine.setDefaultChannelID('');
                     successReaction(ev, reply);
                 });
             }
